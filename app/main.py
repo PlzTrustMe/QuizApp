@@ -4,7 +4,7 @@ import logging
 import uvicorn
 from fastapi import FastAPI
 
-from quiz_app.routers.setup import setup_routers
+from app.routers.setup import setup_routers
 
 logger = logging.getLogger(__name__)
 
@@ -24,20 +24,10 @@ def create_app() -> FastAPI:
     return app
 
 
-async def run_api(app: FastAPI) -> None:
-    config = uvicorn.Config(app, reload=True, log_level=logging.INFO)
-    server = uvicorn.Server(config)
-
-    logger.info("Running API")
-    await server.serve()
-
-
-async def main() -> None:
-    logger.info("Launch app")
-
-    app = create_app()
-    await run_api(app)
-
-
 if __name__ == "__main__":
-    asyncio.run(main())
+    uvicorn.run(
+        "main:create_app",
+        reload=True,
+        log_level=logging.INFO,
+        factory=True
+    )

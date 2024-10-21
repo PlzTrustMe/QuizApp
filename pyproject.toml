@@ -15,5 +15,3 @@ uvicorn = "^0.32.0"
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.setuptools]
-package-dir = {"" = "src"}
