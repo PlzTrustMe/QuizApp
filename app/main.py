@@ -1,7 +1,9 @@
 import logging
 
+import uvicorn
 from fastapi import FastAPI
 
+from app.config import load_config
 from app.routers import setup_routers
 
 logger = logging.getLogger(__name__)
@@ -20,3 +22,16 @@ def create_app() -> FastAPI:
     setup_routers(app)
 
     return app
+
+
+if __name__ == "__main__":
+    config = load_config()
+
+    uvicorn.run(
+        "main:create_app",
+        host=config.web_config.server_host,
+        port=config.web_config.server_port,
+        reload=True,
+        log_level=logging.INFO,
+        factory=True
+    )
