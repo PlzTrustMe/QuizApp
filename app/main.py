@@ -5,7 +5,7 @@ import uvicorn
 from fastapi import FastAPI
 
 from app.config import load_config
-from app.routers.setup import setup_routers
+from app.routers import setup_routers
 
 logger = logging.getLogger(__name__)
 
