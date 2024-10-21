@@ -8,8 +8,12 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.11"
 fastapi = "^0.115.2"
+uvicorn = "^0.32.0"
 
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
