@@ -4,7 +4,7 @@ import uvicorn
 from fastapi import FastAPI
 
 from app.config import load_config
-from app.routers import setup_routers
+from app.routers import setup_middlewares, setup_routers
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +20,7 @@ def create_app() -> FastAPI:
     )
 
     setup_routers(app)
+    setup_middlewares(app)
 
     return app
 
