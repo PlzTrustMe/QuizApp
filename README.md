@@ -17,6 +17,7 @@ cd QuizApp
 ```
 
 ## Environment Setup
+Copy .env.sample to .env and fill in the required data, if necessary
 
 Installing project in development mode
 
