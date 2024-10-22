@@ -10,9 +10,8 @@ ENV POETRY_NO_INTERACTION=1 \
 WORKDIR /backend
 
 COPY pyproject.toml poetry.lock ./
-RUN touch README.md
 
-RUN --mount=type=cache,target=$POETRY_CACHE_DIR poetry install --without test --no-root
+RUN --mount=type=cache,target=$POETRY_CACHE_DIR poetry install --with test --no-root
 
 FROM python:3.11-slim-buster as runtime
 
@@ -22,7 +21,6 @@ ENV VIRTUAL_ENV=/backend/.venv \
 COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 
 COPY app ./app
+COPY tests ./tests
 
-EXPOSE $SERVER_PORT
-
-ENTRYPOINT ["sh", "-c", "uvicorn app.main:create_app --host $SERVER_HOST --port $SERVER_PORT --factory --reload"]
+ENTRYPOINT ["sh", "-c", "pytest tests --maxfail=1 --disable-warnings"]
