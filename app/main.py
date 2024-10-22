@@ -40,10 +40,10 @@ if __name__ == "__main__":
     config = load_config()
 
     uvicorn.run(
-        "main:create_app",
+        "app.main:create_app",
         host=config.web_config.server_host,
         port=config.web_config.server_port,
-        reload=True,
         log_level=logging.INFO,
+        reload=True,
         factory=True
     )
