@@ -40,12 +40,12 @@ poetry shell
 
 #### With Docker compose:
 ```bash
-docker compose up --build   
+docker compose up --build
 ```
 
 #### Local:
 ```bash
-uvicorn app.main:create_app --reload --factory  
+uvicorn app.main:create_app --reload --factory
 ```
 
 ## Running tests
@@ -58,7 +58,7 @@ pytest tests
 #### With Dockerfile
 Build:
 ```bash
-docker build -t YOUR_TEST_CONTAINER_NAME -f test.Dockerfile .    
+docker build -t YOUR_TEST_CONTAINER_NAME -f test.Dockerfile .
 ```
 Run:
 ```bash

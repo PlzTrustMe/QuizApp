@@ -11,7 +11,7 @@ WORKDIR /backend
 
 COPY pyproject.toml poetry.lock ./
 
-RUN --mount=type=cache,target=$POETRY_CACHE_DIR poetry install --without test --no-root
+RUN --mount=type=cache,target=$POETRY_CACHE_DIR poetry install --without test, dev --no-root
 
 FROM python:3.11-slim-buster as runtime
 

@@ -28,9 +28,7 @@ def load_config() -> Config:
     env = Env()
     env.read_env(".env")
 
-    config = Config(
-        web_config=WebConfig.from_env(env)
-    )
+    config = Config(web_config=WebConfig.from_env(env))
 
     logger.info("Config successfully loaded")
 

@@ -22,19 +22,16 @@ def load_all_configs() -> AllConfigs:
         password=env.str("POSTGRES_PASSWORD"),
         host=env.str("POSTGRES_HOST"),
         port=env.int("POSTGRES_PORT"),
-        db_name=env.str("POSTGRES_DB")
+        db_name=env.str("POSTGRES_DB"),
     )
 
     cache_config = RedisConfig(
         password=env.str("REDIS_PASSWORD"),
         host=env.str("REDIS_HOST"),
         port=env.int("REDIS_PORT"),
-        db=env.int("REDIS_DB")
+        db=env.int("REDIS_DB"),
     )
 
     logging.info("All configs loaded.")
 
-    return AllConfigs(
-        db=db_config,
-        cache=cache_config
-    )
+    return AllConfigs(db=db_config, cache=cache_config)
