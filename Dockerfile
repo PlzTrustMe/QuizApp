@@ -1,6 +1,4 @@
-FROM python:3.11-slim-buster
-
-WORKDIR /app
+FROM python:3.11-buster as builder
 
 RUN pip install poetry==1.8.3
 
@@ -9,12 +7,22 @@ ENV POETRY_NO_INTERACTION=1 \
     POETRY_VIRTUALENVS_CREATE=1 \
     POETRY_CACHE_DIR=/tmp/poetry_cache
 
-COPY . .
+WORKDIR /backend
 
-RUN poetry install --no-root --without test && rm -rf $POETRY_CACHE_DIR
+COPY pyproject.toml poetry.lock ./
+RUN touch README.md
 
-RUN poetry install
+RUN --mount=type=cache,target=$POETRY_CACHE_DIR poetry install --without test --no-root
 
-EXPOSE 8000
+FROM python:3.11-slim-buster as runtime
 
-CMD ["sh", "-c", "poetry run uvicorn app.main:create_app --host $SERVER_HOST --port $SERVER_PORT --factory --reload"]
+ENV VIRTUAL_ENV=/backend/.venv \
+    PATH="/backend/.venv/bin:$PATH"
+
+COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
+
+COPY app ./app
+
+EXPOSE $SERVER_PORT
+
+ENTRYPOINT ["sh", "-c", "uvicorn app.main:create_app --host $SERVER_HOST --port $SERVER_PORT --factory --reload"]
