@@ -13,8 +13,8 @@ COPY . .
 
 RUN poetry install --no-root --without test && rm -rf $POETRY_CACHE_DIR
 
-RUN poetry install
+#RUN poetry install
 
-EXPOSE 8000
-
-CMD ["sh", "-c", "poetry run uvicorn app.main:create_app --host $SERVER_HOST --port $SERVER_PORT --factory --reload"]
+#EXPOSE 8000
+#
+#CMD ["sh", "-c", "poetry run uvicorn app.main:create_app --host $SERVER_HOST --port $SERVER_PORT --factory --reload"]

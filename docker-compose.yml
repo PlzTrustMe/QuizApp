@@ -1,0 +1,22 @@
+services:
+  backend:
+    container_name: backend
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./:/app
+    env_file:
+      - ".env"
+    command:
+      - "poetry"
+      - "run"
+      - "uvicorn"
+      - "app.main:create_app"
+      - "--host"
+      - "${SERVER_HOST}"
+      - "--port"
+      - "${SERVER_PORT}"
+      - "--reload"
+      - "--factory"
