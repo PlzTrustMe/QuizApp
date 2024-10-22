@@ -11,3 +11,26 @@ services:
       - "${SERVER_PORT}:${SERVER_PORT}"
     volumes:
       - ./app:/backend/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    container_name: db
+    image: postgres:16-alpine
+    restart: unless-stopped
+    volumes:
+      - pg_data:/var/lib/postgresql/data/
+    env_file:
+      - .env
+    ports:
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -d $$POSTGRES_DB -U $$POSTGRES_USER" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  pg_data:
