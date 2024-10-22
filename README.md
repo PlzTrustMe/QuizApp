@@ -7,6 +7,9 @@ Before you begin, ensure you have met the following requirements:
 - **Poetry**: Download and install
   Poetry [here](https://python-poetry.org/docs/)
 
+- **Docker**: Download and install
+   Docker [here](https://docs.docker.com/engine/install/)
+
 ## Installation
 
 Clone the repository to your local machine:
@@ -33,14 +36,34 @@ poetry shell
 
 ## Running the Project
 
-To build and run the project, execute:
+### To build and run the project
 
+#### With Dockerfile:
+```bash
+docker build -t YOUR_CONTAINER_NAME -f prod.Dockerfile .    
+```
+```bash
+ docker run --env-file .env -p 8000:8000 YOUR_CONTAINER_NAME      
+```
+
+#### Local:
 ```bash
 uvicorn app.main:create_app --reload --factory  
 ```
 
 ## Running tests
 
+#### Local:
 ```shell
 pytest tests
+```
+
+#### With Docker
+Build:
+```bash
+docker build -t YOUR_TEST_CONTAINER_NAME -f test.Dockerfile .    
+```
+Run:
+```bash
+docker run YOUR_TEST_CONTAINER_NAME
 ```

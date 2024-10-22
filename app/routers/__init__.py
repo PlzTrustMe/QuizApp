@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+
 from .healthcheck import healthcheck_router
 
 

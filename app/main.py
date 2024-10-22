@@ -1,13 +1,23 @@
-import asyncio
 import logging
 
 import uvicorn
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import load_config
 from app.routers import setup_routers
 
 logger = logging.getLogger(__name__)
+
+
+def setup_middlewares(app: FastAPI) -> None:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
 
 def create_app() -> FastAPI:
@@ -21,6 +31,7 @@ def create_app() -> FastAPI:
     )
 
     setup_routers(app)
+    setup_middlewares(app)
 
     return app
 
