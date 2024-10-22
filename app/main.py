@@ -1,10 +1,13 @@
 import logging
+from contextlib import asynccontextmanager
 
 import uvicorn
+from dishka.integrations.fastapi import setup_dishka
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import load_config
+from app.infrastructure.bootstrap.di import setup_http_di
 from app.routers import setup_routers
 
 logger = logging.getLogger(__name__)
@@ -20,6 +23,12 @@ def setup_middlewares(app: FastAPI) -> None:
     )
 
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    yield
+    await app.state.dishka_container.close()
+
+
 def create_app() -> FastAPI:
     logger.debug("Initialize API")
 
@@ -27,11 +36,14 @@ def create_app() -> FastAPI:
         title="Quiz app",
         docs_url="/api/docs",
         description="Application for internship at meduzzen",
-        debug=True
+        debug=True,
+        lifespan=lifespan
     )
 
     setup_routers(app)
     setup_middlewares(app)
+
+    setup_dishka(setup_http_di(), app)
 
     return app
 
@@ -45,5 +57,6 @@ if __name__ == "__main__":
         port=config.web_config.server_port,
         log_level=logging.INFO,
         reload=True,
-        factory=True
+        factory=True,
+        lifespan="on"
     )

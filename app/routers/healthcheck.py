@@ -1,5 +1,3 @@
-from dataclasses import dataclass
-
 from fastapi import APIRouter, status
 
 from app.schemas.healthckech import HealthCheckResponseSchema
