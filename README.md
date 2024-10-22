@@ -39,22 +39,31 @@ poetry shell
 ### To build and run the project
 
 #### With Dockerfile:
-
 ```bash
-docker build -t YOUR_CONTAINER_NAME .    
+docker build -t YOUR_CONTAINER_NAME -f prod.Dockerfile .    
 ```
 ```bash
  docker run --env-file .env -p 8000:8000 YOUR_CONTAINER_NAME      
 ```
 
 #### Local:
-
 ```bash
 uvicorn app.main:create_app --reload --factory  
 ```
 
 ## Running tests
 
+#### Local:
 ```shell
 pytest tests
+```
+
+#### With Docker
+Build:
+```bash
+docker build -t YOUR_TEST_CONTAINER_NAME -f test.Dockerfile .    
+```
+Run:
+```bash
+docker run YOUR_TEST_CONTAINER_NAME
 ```
