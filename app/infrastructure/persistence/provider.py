@@ -10,9 +10,9 @@ from app.infrastructure.persistence.config import DBConfig
 from typing import AsyncGenerator, AsyncIterable
 
 
-async def get_engine(settings: DBConfig) -> AsyncGenerator[AsyncEngine, None]:
+async def get_engine(config: DBConfig) -> AsyncGenerator[AsyncEngine, None]:
     engine = create_async_engine(
-        settings.get_connection_url(),
+        config.get_connection_url(),
         future=True,
     )
 
