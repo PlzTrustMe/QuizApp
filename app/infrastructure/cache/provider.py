@@ -10,7 +10,7 @@ async def get_redis(config: RedisConfig) -> AsyncGenerator[Redis, None]:
     redis = Redis.from_url(
         url=config.get_connection_url(),
         encoding="utf-8",
-        decode_responses=True
+        decode_responses=True,
     )
 
     logging.info("Redis client was created.")

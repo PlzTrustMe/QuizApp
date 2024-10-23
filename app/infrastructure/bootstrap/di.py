@@ -7,8 +7,9 @@ from app.infrastructure.cache.config import RedisConfig
 from app.infrastructure.cache.provider import get_redis
 from app.infrastructure.persistence.config import DBConfig
 from app.infrastructure.persistence.provider import (
-    get_async_session, get_async_sessionmaker,
-    get_engine
+    get_async_session,
+    get_async_sessionmaker,
+    get_engine,
 )
 
 
@@ -37,20 +38,14 @@ def config_provider() -> Provider:
 
     provider.provide(lambda: config.db, scope=Scope.APP, provides=DBConfig)
     provider.provide(
-        lambda: config.cache,
-        scope=Scope.APP,
-        provides=RedisConfig
+        lambda: config.cache, scope=Scope.APP, provides=RedisConfig
     )
 
     return provider
 
 
 def setup_providers() -> Iterable[Provider]:
-    return [
-        db_provider(),
-        cache_provider(),
-        config_provider()
-    ]
+    return [db_provider(), cache_provider(), config_provider()]
 
 
 def setup_http_di() -> AsyncContainer:
