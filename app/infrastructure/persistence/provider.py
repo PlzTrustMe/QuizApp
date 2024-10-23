@@ -26,7 +26,7 @@ async def get_engine(config: DBConfig) -> AsyncGenerator[AsyncEngine, None]:
     logging.info("Engine was disposed.")
 
 
-async def get_async_sessionmaker(
+def get_async_sessionmaker(
     engine: AsyncEngine,
 ) -> async_sessionmaker[AsyncSession]:
     session_factory = async_sessionmaker(
