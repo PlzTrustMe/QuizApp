@@ -11,7 +11,7 @@ WORKDIR /backend
 
 COPY pyproject.toml poetry.lock ./
 
-RUN --mount=type=cache,target=$POETRY_CACHE_DIR poetry install --without test, dev --no-root
+RUN --mount=type=cache,target=$POETRY_CACHE_DIR poetry install --without test,dev --no-root
 
 FROM python:3.11-slim-buster as runtime
 
@@ -21,5 +21,6 @@ ENV VIRTUAL_ENV=/backend/.venv \
 COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 
 COPY app ./app
+COPY alembic.ini ./
 
 CMD ["python", "-m", "app.main"]

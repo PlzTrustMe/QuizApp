@@ -64,3 +64,22 @@ Run:
 ```bash
 docker run YOUR_TEST_CONTAINER_NAME
 ```
+
+## Running linters
+
+### Lint
+```shell
+ruff check
+```
+
+### Format
+```shell
+ruff format
+```
+
+## Migrations
+### To create a migration
+```shell
+alembic revision --autogenerate  -m "comment to migration"
+```
+After creation, run the project and compose will automatically perform the migrations
