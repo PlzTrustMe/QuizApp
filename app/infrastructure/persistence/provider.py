@@ -1,13 +1,14 @@
 import logging
+from typing import AsyncGenerator, AsyncIterable
 
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
-    AsyncSession, async_sessionmaker,
-    create_async_engine
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
 )
 
 from app.infrastructure.persistence.config import DBConfig
-from typing import AsyncGenerator, AsyncIterable
 
 
 async def get_engine(config: DBConfig) -> AsyncGenerator[AsyncEngine, None]:
@@ -25,7 +26,7 @@ async def get_engine(config: DBConfig) -> AsyncGenerator[AsyncEngine, None]:
     logging.info("Engine was disposed.")
 
 
-async def get_async_sessionmaker(
+def get_async_sessionmaker(
     engine: AsyncEngine,
 ) -> async_sessionmaker[AsyncSession]:
     session_factory = async_sessionmaker(

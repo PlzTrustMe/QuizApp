@@ -37,7 +37,7 @@ def create_app() -> FastAPI:
         docs_url="/api/docs",
         description="Application for internship at meduzzen",
         debug=True,
-        lifespan=lifespan
+        lifespan=lifespan,
     )
 
     setup_routers(app)
@@ -58,5 +58,5 @@ if __name__ == "__main__":
         log_level=logging.INFO,
         reload=True,
         factory=True,
-        lifespan="on"
+        lifespan="on",
     )

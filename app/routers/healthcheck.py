@@ -9,9 +9,7 @@ healthcheck_router = APIRouter(tags=["Healthcheck"])
     "/",
     status_code=status.HTTP_200_OK,
     description="Healthcheck endpoint to check the health of the project",
-    responses={
-        status.HTTP_200_OK: {"model": HealthCheckResponseSchema}
-    }
+    responses={status.HTTP_200_OK: {"model": HealthCheckResponseSchema}},
 )
 async def healthcheck_handler() -> HealthCheckResponseSchema:
     return HealthCheckResponseSchema()
