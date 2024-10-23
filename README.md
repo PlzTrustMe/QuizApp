@@ -64,3 +64,15 @@ Run:
 ```bash
 docker run YOUR_TEST_CONTAINER_NAME
 ```
+
+## Running linters
+
+### Lint
+```shell
+ruff check
+```
+
+### Format
+```shell
+ruff format
+```
