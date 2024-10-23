@@ -3,7 +3,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.commands.errors import UnexpectedError
-from app.core.entities.user import User
+from app.core.entities.user import User, UserId
 from app.core.interfaces.user_gateways import UserGateway
 from app.infrastructure.persistence.models.user import users_table
 
@@ -26,3 +26,10 @@ class UserMapper(UserGateway):
             await self.session.flush()
         except IntegrityError as error:
             raise UnexpectedError from error
+
+    async def by_id(self, user_id: UserId) -> User | None:
+        query = select(User).where(users_table.c.user_id == user_id)
+
+        result = await self.session.execute(query)
+
+        return result.scalar_one_or_none()

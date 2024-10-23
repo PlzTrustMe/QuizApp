@@ -25,9 +25,9 @@ class SignInSchema(BaseModel):
     password: str
 
 
-class UserUpdateSchema(BaseModel):
-    first_name: str | None = None
-    last_name: str | None = None
+class UserUpdateFullNameSchema(BaseModel):
+    first_name: str
+    last_name: str
 
 
 class UserDetail(BaseModel):

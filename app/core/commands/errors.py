@@ -15,3 +15,12 @@ class UserEmailAlreadyExistError(ApplicationError):
     @property
     def message(self) -> str:
         return f"User with email {self.email} already exist"
+
+
+@dataclass
+class UserNotFoundError(ApplicationError):
+    user_id: int
+
+    @property
+    def message(self) -> str:
+        return f"User with id={self.user_id} not found"
