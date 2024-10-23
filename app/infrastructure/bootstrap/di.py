@@ -4,6 +4,7 @@ import argon2
 from dishka import AsyncContainer, Provider, Scope, make_async_container
 
 from app.core.commands.add_user import SignUp
+from app.core.commands.delete_user import DeleteUser
 from app.core.commands.edit_full_name import EditFullName
 from app.core.common.commiter import Commiter
 from app.core.interfaces.password_hasher import PasswordHasher
@@ -50,6 +51,7 @@ def interactor_provider() -> Provider:
 
     provider.provide(SignUp, scope=Scope.REQUEST)
     provider.provide(EditFullName, scope=Scope.REQUEST)
+    provider.provide(DeleteUser, scope=Scope.REQUEST)
 
     return provider
 

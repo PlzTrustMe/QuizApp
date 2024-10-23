@@ -7,6 +7,7 @@ from app.core.commands.add_user import (
     SignUpInputData,
     SignUpOutputData,
 )
+from app.core.commands.delete_user import DeleteUser, DeleteUserInputData
 from app.core.commands.edit_full_name import (
     EditFullName,
     EditFullNameInputData,
@@ -79,3 +80,18 @@ async def edit_full_name(
         ) from error
     else:
         return response
+
+
+@user_router.delete("/{user_id}/", status_code=status.HTTP_200_OK)
+async def delete_user(user_id: int, action: FromDishka[DeleteUser]):
+    try:
+        await action(
+            DeleteUserInputData(
+                user_id=user_id,
+            )
+        )
+    except ApplicationError as error:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"error": error.message},
+        ) from error

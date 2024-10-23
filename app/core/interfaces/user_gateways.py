@@ -16,3 +16,7 @@ class UserGateway(Protocol):
     @abstractmethod
     async def by_id(self, user_id: UserId) -> User | None:
         raise NotImplementedError
+
+    @abstractmethod
+    async def delete(self, user_id: UserId) -> None:
+        raise NotImplementedError
