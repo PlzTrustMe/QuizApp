@@ -8,14 +8,19 @@ from app.core.commands.delete_user import DeleteUser
 from app.core.commands.edit_full_name import EditFullName
 from app.core.common.commiter import Commiter
 from app.core.interfaces.password_hasher import PasswordHasher
-from app.core.interfaces.user_gateways import UserGateway
+from app.core.interfaces.user_gateways import UserGateway, UserReader
+from app.core.queries.get_user import GetUserById
+from app.core.queries.get_users import GetUsers
 from app.infrastructure.auth.password_hasher import ArgonPasswordHasher
 from app.infrastructure.bootstrap.configs import load_all_configs
 from app.infrastructure.cache.config import RedisConfig
 from app.infrastructure.cache.provider import get_redis
 from app.infrastructure.persistence.commiter import SACommiter
 from app.infrastructure.persistence.config import DBConfig
-from app.infrastructure.persistence.gateways.user import UserMapper
+from app.infrastructure.persistence.gateways.user import (
+    SQLAlchemyUserReader,
+    UserMapper,
+)
 from app.infrastructure.persistence.provider import (
     get_async_session,
     get_async_sessionmaker,
@@ -27,6 +32,9 @@ def gateway_provider() -> Provider:
     provider = Provider()
 
     provider.provide(UserMapper, scope=Scope.REQUEST, provides=UserGateway)
+    provider.provide(
+        SQLAlchemyUserReader, scope=Scope.REQUEST, provides=UserReader
+    )
 
     provider.provide(
         SACommiter,
@@ -52,6 +60,8 @@ def interactor_provider() -> Provider:
     provider.provide(SignUp, scope=Scope.REQUEST)
     provider.provide(EditFullName, scope=Scope.REQUEST)
     provider.provide(DeleteUser, scope=Scope.REQUEST)
+    provider.provide(GetUserById, scope=Scope.REQUEST)
+    provider.provide(GetUsers, scope=Scope.REQUEST)
 
     return provider
 
