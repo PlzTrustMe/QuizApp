@@ -2,9 +2,11 @@ from typing import Iterable
 
 from dishka import AsyncContainer, Provider, Scope, make_async_container
 
+from app.core.common.commiter import Commiter
 from app.infrastructure.bootstrap.configs import load_all_configs
 from app.infrastructure.cache.config import RedisConfig
 from app.infrastructure.cache.provider import get_redis
+from app.infrastructure.persistence.commiter import SACommiter
 from app.infrastructure.persistence.config import DBConfig
 from app.infrastructure.persistence.provider import (
     get_async_session,
@@ -19,6 +21,12 @@ def db_provider() -> Provider:
     provider.provide(get_engine, scope=Scope.APP)
     provider.provide(get_async_sessionmaker, scope=Scope.APP)
     provider.provide(get_async_session, scope=Scope.REQUEST)
+
+    provider.provide(
+        SACommiter,
+        scope=Scope.REQUEST,
+        provides=Commiter,
+    )
 
     return provider
 
