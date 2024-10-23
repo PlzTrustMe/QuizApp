@@ -76,3 +76,10 @@ ruff check
 ```shell
 ruff format
 ```
+
+## Migrations
+### To create a migration
+```shell
+alembic revision --autogenerate  -m "comment to migration"
+```
+After creation, run the project and compose will automatically perform the migrations
