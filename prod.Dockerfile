@@ -22,6 +22,4 @@ COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 
 COPY app ./app
 
-EXPOSE $SERVER_PORT
-
-ENTRYPOINT ["sh", "-c", "uvicorn app.main:create_app --host $SERVER_HOST --port $SERVER_PORT --factory --reload"]
+CMD ["python", "-m", "app.main"]
