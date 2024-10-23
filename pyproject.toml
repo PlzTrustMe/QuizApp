@@ -15,6 +15,7 @@ asyncpg = "^0.30.0"
 dishka = "^1.4.0"
 greenlet = "^3.1.1"
 redis = "^5.1.1"
+alembic = "^1.13.3"
 
 
 [tool.poetry.group.test.dependencies]
@@ -74,7 +75,8 @@ ignore = [
     'B024',
     'ISC001',
     'B027',
-    'COM812'
+    'COM812',
+    'N999'
 ]
 
 [tool.ruff.lint.per-file-ignores]
