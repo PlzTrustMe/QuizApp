@@ -7,6 +7,8 @@ class SignUpSchema(BaseModel):
     email: str
     password: str
     password2: str
+    first_name: str
+    last_name: str
 
     @model_validator(mode="after")
     def check_passwords_match(self) -> Self:

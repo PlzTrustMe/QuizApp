@@ -30,6 +30,17 @@ class EmptyError(BaseError):
 
 @dataclass(eq=False)
 class InvalidUserEmailError(BaseError):
+    email: str
+
     @property
     def message(self):
-        return "Invalid user email"
+        return f"Invalid user email {self.email}"
+
+
+@dataclass(eq=False)
+class WeakPasswordError(BaseError):
+    error: str
+
+    @property
+    def message(self):
+        return f"Invalid user password, error - {self.error}"
