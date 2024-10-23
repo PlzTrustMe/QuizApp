@@ -1,15 +1,15 @@
 from dataclasses import dataclass
 
-from app.core.common.base_error import BaseError
+from app.core.common.base_error import ApplicationError
 
 
 @dataclass(eq=False)
-class UnexpectedError(BaseError):
+class UnexpectedError(ApplicationError):
     pass
 
 
 @dataclass(eq=False)
-class UserEmailAlreadyExistError(BaseError):
+class UserEmailAlreadyExistError(ApplicationError):
     email: str
 
     @property

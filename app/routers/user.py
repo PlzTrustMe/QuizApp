@@ -1,12 +1,13 @@
 from dishka import FromDishka
 from dishka.integrations.fastapi import DishkaRoute
-from fastapi import APIRouter, status
+from fastapi import APIRouter, HTTPException, status
 
 from app.core.commands.add_user import (
     SignUp,
     SignUpInputData,
     SignUpOutputData,
 )
+from app.core.common.base_error import ApplicationError
 from app.schemas.base import ErrorSchema
 from app.schemas.user import SignUpSchema
 
@@ -27,13 +28,19 @@ user_router = APIRouter(
     },
 )
 async def sign_up(body: SignUpSchema, action: FromDishka[SignUp]):
-    response = await action(
-        SignUpInputData(
-            email=body.email,
-            password=body.password,
-            first_name=body.first_name,
-            last_name=body.last_name,
+    try:
+        response = await action(
+            SignUpInputData(
+                email=body.email,
+                password=body.password,
+                first_name=body.first_name,
+                last_name=body.last_name,
+            )
         )
-    )
-
-    return response
+    except ApplicationError as error:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"error": error.message},
+        ) from error
+    else:
+        return response
