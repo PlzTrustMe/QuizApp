@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import load_config
 from app.infrastructure.bootstrap.di import setup_http_di
+from app.infrastructure.persistence.models import map_tables
 from app.routers import setup_routers
 
 logger = logging.getLogger(__name__)
@@ -44,6 +45,8 @@ def create_app() -> FastAPI:
     setup_middlewares(app)
 
     setup_dishka(setup_http_di(), app)
+
+    map_tables()
 
     return app
 

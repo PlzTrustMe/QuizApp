@@ -8,7 +8,7 @@ UserId = NewType("UserId", int)
 
 @dataclass
 class User:
-    user_id: UserId
+    user_id: UserId | None
     full_name: FullName
     email: UserEmail
     hashed_password: str
