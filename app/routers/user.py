@@ -136,7 +136,7 @@ async def get_user(
     return OkResponse(result=response)
 
 
-@user_router.get("", response_model=GetUsersOutputData)
+@user_router.get("")
 async def get_users(
     action: FromDishka[GetUsers],
     is_active: bool | None = None,
