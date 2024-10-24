@@ -1,3 +1,4 @@
+import logging
 from dataclasses import dataclass
 
 from app.core.commands.errors import UserNotFoundError
@@ -18,5 +19,7 @@ class GetUserById:
         user = await self.user_reader.by_id(UserId(data.user_id))
         if not user:
             raise UserNotFoundError(data.user_id)
+
+        logging.info("Get user with id=%s", data.user_id)
 
         return user

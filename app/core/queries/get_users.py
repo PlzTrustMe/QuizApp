@@ -1,4 +1,5 @@
 import asyncio
+import logging
 from dataclasses import dataclass
 
 from app.core.common.pagination import Pagination
@@ -30,5 +31,7 @@ class GetUsers:
         users = await asyncio.create_task(
             self.user_reader.get_users(data.filters, data.pagination)
         )
+
+        logging.info("Get users, total=%s", total)
 
         return GetUsersOutputData(total=total, users=users)
