@@ -4,11 +4,6 @@ from dishka import FromDishka
 from dishka.integrations.fastapi import DishkaRoute
 from fastapi import APIRouter, Query, status
 
-from app.core.commands.add_user import (
-    SignUp,
-    SignUpInputData,
-    SignUpOutputData,
-)
 from app.core.commands.delete_user import DeleteUser, DeleteUserInputData
 from app.core.commands.edit_full_name import (
     EditFullName,
@@ -16,6 +11,11 @@ from app.core.commands.edit_full_name import (
     EditFullNameOutputData,
 )
 from app.core.commands.errors import UserNotFoundError
+from app.core.commands.sign_up import (
+    SignUp,
+    SignUpInputData,
+    SignUpOutputData,
+)
 from app.core.common.pagination import Pagination, SortOrder
 from app.core.entities.errors import (
     EmptyError,

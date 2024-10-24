@@ -55,6 +55,9 @@ class UserEmail:
     def __str__(self) -> str:
         return self.email
 
+    def to_row(self) -> str:
+        return self.email
+
 
 def has_special_symbols(string: str) -> bool:
     regex = re.compile("[@_!#$%^&*()<>?/}{~:]")

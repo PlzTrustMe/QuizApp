@@ -18,4 +18,5 @@ class GetUserById:
         user = await self.user_reader.by_id(UserId(data.user_id))
         if not user:
             raise UserNotFoundError(data.user_id)
+
         return user

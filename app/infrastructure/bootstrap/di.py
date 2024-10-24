@@ -3,9 +3,9 @@ from typing import Iterable
 import argon2
 from dishka import AsyncContainer, Provider, Scope, make_async_container
 
-from app.core.commands.add_user import SignUp
 from app.core.commands.delete_user import DeleteUser
 from app.core.commands.edit_full_name import EditFullName
+from app.core.commands.sign_up import SignUp
 from app.core.common.commiter import Commiter
 from app.core.interfaces.password_hasher import PasswordHasher
 from app.core.interfaces.user_gateways import UserGateway, UserReader

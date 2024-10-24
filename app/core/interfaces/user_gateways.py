@@ -1,7 +1,6 @@
 from abc import abstractmethod
 from asyncio import Protocol
 from dataclasses import dataclass
-from typing import Iterable
 
 from app.core.common.pagination import Pagination
 from app.core.entities.user import User, UserId
@@ -45,7 +44,7 @@ class UserReader(Protocol):
     @abstractmethod
     async def get_users(
         self, filters: UserFilters, pagination: Pagination
-    ) -> Iterable[UserDetail]:
+    ) -> list[UserDetail]:
         raise NotImplementedError
 
     @abstractmethod
