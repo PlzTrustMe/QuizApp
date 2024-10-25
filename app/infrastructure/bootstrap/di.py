@@ -38,6 +38,7 @@ from app.infrastructure.persistence.provider import (
     get_async_sessionmaker,
     get_engine,
 )
+from app.routers.auth.config import TokenAuthConfig
 from app.routers.auth.token_auth import TokenAuth
 
 
@@ -119,6 +120,9 @@ def config_provider() -> Provider:
         lambda: config.cache, scope=Scope.APP, provides=RedisConfig
     )
     provider.provide(lambda: config.jwt, scope=Scope.APP, provides=JWTConfig)
+    provider.provide(
+        lambda: config.token_auth, scope=Scope.APP, provides=TokenAuthConfig
+    )
 
     return provider
 
@@ -128,10 +132,15 @@ class HTTPProvider(Provider):
 
     @provide(scope=Scope.REQUEST)
     def get_token_auth(
-        self, request: Request, token_processor: AccessTokenProcessor
+        self,
+        request: Request,
+        token_processor: AccessTokenProcessor,
+        token_auth_config: TokenAuthConfig,
     ) -> TokenAuth:
         token_auth = TokenAuth(
-            request=request, token_processor=token_processor
+            request=request,
+            token_processor=token_processor,
+            config=token_auth_config,
         )
         return token_auth
 
