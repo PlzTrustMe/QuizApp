@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from environs import Env
 
 from app.infrastructure.cache.config import RedisConfig
+from app.infrastructure.jwt.config import JWTConfig
 from app.infrastructure.persistence.config import DBConfig
 
 
@@ -11,6 +12,7 @@ from app.infrastructure.persistence.config import DBConfig
 class AllConfigs:
     db: DBConfig
     cache: RedisConfig
+    jwt: JWTConfig
 
 
 def load_all_configs() -> AllConfigs:
@@ -32,6 +34,10 @@ def load_all_configs() -> AllConfigs:
         db=env.int("REDIS_DB"),
     )
 
+    jwt_config = JWTConfig(
+        key=env.str("JWT_KEY"), algorithm=env.str("JWT_ALGORITHM")
+    )
+
     logging.info("All configs loaded.")
 
-    return AllConfigs(db=db_config, cache=cache_config)
+    return AllConfigs(db=db_config, cache=cache_config, jwt=jwt_config)

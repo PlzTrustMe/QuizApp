@@ -2,7 +2,8 @@ from typing import Annotated
 
 from dishka import FromDishka
 from dishka.integrations.fastapi import DishkaRoute
-from fastapi import APIRouter, Query, status
+from fastapi import APIRouter, Query, Response, status
+from fastapi.responses import JSONResponse
 
 from app.core.commands.delete_user import DeleteUser, DeleteUserInputData
 from app.core.commands.edit_full_name import (
@@ -10,7 +11,8 @@ from app.core.commands.edit_full_name import (
     EditFullNameInputData,
     EditFullNameOutputData,
 )
-from app.core.commands.errors import UserNotFoundError
+from app.core.commands.errors import PasswordMismatchError, UserNotFoundError
+from app.core.commands.sign_in import SignIn, SignInInputData, SignInOutputData
 from app.core.commands.sign_up import (
     SignUp,
     SignUpInputData,
@@ -31,8 +33,13 @@ from app.core.queries.get_users import (
     GetUsersInputData,
     GetUsersOutputData,
 )
+from app.routers.auth.token_auth import TokenAuth
 from app.routers.responses.base import ErrorResponse, OkResponse
-from app.schemas.user import SignUpSchema, UserUpdateFullNameSchema
+from app.schemas.user import (
+    SignInSchema,
+    SignUpSchema,
+    UserUpdateFullNameSchema,
+)
 
 user_router = APIRouter(
     prefix="/user",
@@ -70,6 +77,33 @@ async def sign_up(
     )
 
     return OkResponse(result=response)
+
+
+@user_router.post(
+    "/sign-in",
+    status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_200_OK: {"model": SignInOutputData},
+        status.HTTP_422_UNPROCESSABLE_ENTITY: {
+            "model": ErrorResponse[InvalidUserEmailError]
+        },
+        status.HTTP_401_UNAUTHORIZED: {
+            "model": ErrorResponse[PasswordMismatchError]
+        },
+    },
+)
+async def sign_in(
+    body: SignInSchema,
+    action: FromDishka[SignIn],
+    token_auth: FromDishka[TokenAuth],
+) -> Response:
+    access_token_data = await action(
+        SignInInputData(email=body.email, password=body.password)
+    )
+
+    response = JSONResponse(status_code=200, content={})
+
+    return token_auth.set_session(access_token_data, response)
 
 
 @user_router.put(

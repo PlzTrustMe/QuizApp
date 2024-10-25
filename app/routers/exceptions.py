@@ -6,6 +6,7 @@ from fastapi import FastAPI, status
 from starlette.requests import Request
 
 from app.core.commands.errors import (
+    PasswordMismatchError,
     UserEmailAlreadyExistError,
     UserNotFoundError,
 )
@@ -46,6 +47,9 @@ def setup_exception_handlers(app: FastAPI) -> None:
     )
     app.add_exception_handler(
         UserEmailAlreadyExistError, error_handler(status.HTTP_409_CONFLICT)
+    )
+    app.add_exception_handler(
+        PasswordMismatchError, error_handler(status.HTTP_401_UNAUTHORIZED)
     )
     app.add_exception_handler(Exception, unknown_exception_handler)
 

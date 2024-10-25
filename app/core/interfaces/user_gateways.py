@@ -4,6 +4,7 @@ from dataclasses import dataclass
 
 from app.core.common.pagination import Pagination
 from app.core.entities.user import User, UserId
+from app.core.entities.value_objects import UserEmail
 
 
 class UserGateway(Protocol):
@@ -17,6 +18,10 @@ class UserGateway(Protocol):
 
     @abstractmethod
     async def by_id(self, user_id: UserId) -> User | None:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def by_email(self, email: UserEmail) -> User | None:
         raise NotImplementedError
 
     @abstractmethod

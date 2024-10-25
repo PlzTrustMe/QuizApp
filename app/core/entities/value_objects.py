@@ -1,5 +1,6 @@
 import re
 from dataclasses import dataclass
+from datetime import UTC, datetime
 
 from email_validator import EmailNotValidError, validate_email
 
@@ -91,3 +92,17 @@ class UserRawPassword:
         for message, password_validator in error_messages.items():
             if not password_validator(self.password):
                 raise WeakPasswordError(message)
+
+
+@dataclass(slots=True, frozen=True, eq=True, unsafe_hash=True)
+class ExpiresIn:
+    value: datetime
+
+    @property
+    def is_expired(self) -> bool:
+        now = datetime.now(tz=UTC)
+
+        return now > self.value
+
+    def to_raw(self):
+        return self.value
