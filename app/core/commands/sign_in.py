@@ -20,7 +20,7 @@ class SignInInputData:
 
 
 @dataclass(frozen=True)
-class SignInOutputData:
+class AccessTokenData:
     email: str
     expires_in: datetime
 
@@ -30,7 +30,7 @@ class SignIn:
     user_gateway: UserGateway
     password_hasher: PasswordHasher
 
-    async def __call__(self, data: SignInInputData) -> SignInOutputData:
+    async def __call__(self, data: SignInInputData) -> AccessTokenData:
         email = UserEmail(data.email)
         user_pwd = UserRawPassword(data.password)
 
@@ -43,6 +43,6 @@ class SignIn:
         now = datetime.now(tz=UTC)
         expires_in = ExpiresIn(now + timedelta(minutes=30))
 
-        return SignInOutputData(
+        return AccessTokenData(
             email=user.email.to_row(), expires_in=expires_in.to_raw()
         )

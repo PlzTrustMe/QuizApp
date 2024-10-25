@@ -12,7 +12,7 @@ from app.core.commands.edit_full_name import (
     EditFullNameOutputData,
 )
 from app.core.commands.errors import PasswordMismatchError, UserNotFoundError
-from app.core.commands.sign_in import SignIn, SignInInputData, SignInOutputData
+from app.core.commands.sign_in import AccessTokenData, SignIn, SignInInputData
 from app.core.commands.sign_up import (
     SignUp,
     SignUpInputData,
@@ -27,6 +27,7 @@ from app.core.entities.errors import (
     WeakPasswordError,
 )
 from app.core.interfaces.user_gateways import UserDetail, UserFilters
+from app.core.queries.get_me import GetMe
 from app.core.queries.get_user import GetUserById, GetUserByIdInputData
 from app.core.queries.get_users import (
     GetUsers,
@@ -83,7 +84,7 @@ async def sign_up(
     "/sign-in",
     status_code=status.HTTP_200_OK,
     responses={
-        status.HTTP_200_OK: {"model": SignInOutputData},
+        status.HTTP_200_OK: {"model": AccessTokenData},
         status.HTTP_422_UNPROCESSABLE_ENTITY: {
             "model": ErrorResponse[InvalidUserEmailError]
         },
@@ -104,6 +105,12 @@ async def sign_in(
     response = JSONResponse(status_code=200, content={})
 
     return token_auth.set_session(access_token_data, response)
+
+
+@user_router.get("/me")
+async def get_me(action: FromDishka[GetMe]) -> UserDetail:
+    response = await action()
+    return response
 
 
 @user_router.put(

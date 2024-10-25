@@ -4,7 +4,7 @@ from app.core.commands.errors import (
     AccessTokenIsExpiredError,
     UnauthorizedError,
 )
-from app.core.commands.sign_in import SignInOutputData
+from app.core.commands.sign_in import AccessTokenData
 from app.infrastructure.jwt.exception import JWTDecodeError, JWTExpiredError
 from app.infrastructure.jwt.jwt_processor import JWTProcessor, JWTToken
 
@@ -13,7 +13,7 @@ class AccessTokenProcessor:
     def __init__(self, jwt_processor: JWTProcessor):
         self.jwt_processor = jwt_processor
 
-    def encode(self, token: SignInOutputData) -> JWTToken:
+    def encode(self, token: AccessTokenData) -> JWTToken:
         token_payload = {
             "sub": {"email": token.email},
             "exp": token.expires_in,
@@ -23,7 +23,7 @@ class AccessTokenProcessor:
 
         return token
 
-    def decode(self, token: JWTToken) -> SignInOutputData:
+    def decode(self, token: JWTToken) -> AccessTokenData:
         try:
             payload = self.jwt_processor.decode(token)
             sub = payload["sub"]
@@ -31,7 +31,7 @@ class AccessTokenProcessor:
             email = str(sub["email"])
             expires_in = datetime.fromtimestamp(float(payload["exp"]), UTC)
 
-            data = SignInOutputData(email=email, expires_in=expires_in)
+            data = AccessTokenData(email=email, expires_in=expires_in)
         except JWTExpiredError as exc:
             raise AccessTokenIsExpiredError from exc
         except (JWTDecodeError, ValueError, TypeError, KeyError) as exc:

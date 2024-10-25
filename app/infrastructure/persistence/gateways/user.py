@@ -87,6 +87,20 @@ class SQLAlchemyUserReader(UserReader):
 
         return None if not row else self._load_user(row)
 
+    async def by_email(self, email: UserEmail) -> UserDetail | None:
+        query = select(
+            users_table.c.user_id,
+            users_table.c.user_email,
+            users_table.c.first_name,
+            users_table.c.last_name,
+        ).where(users_table.c.user_email == email.to_row())
+
+        result = await self.session.execute(query)
+
+        row = result.mappings().one_or_none()
+
+        return None if not row else self._load_user(row)
+
     async def get_users(
         self, filters: UserFilters, pagination: Pagination
     ) -> Iterable[UserDetail]:

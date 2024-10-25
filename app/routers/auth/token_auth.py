@@ -1,6 +1,7 @@
 from fastapi import Request, Response
 
-from app.core.commands.sign_in import SignInOutputData
+from app.core.commands.errors import UnauthorizedError
+from app.core.commands.sign_in import AccessTokenData
 from app.infrastructure.auth.access_token_processor import AccessTokenProcessor
 from app.routers.auth.config import TokenAuthConfig
 
@@ -17,7 +18,7 @@ class TokenAuth:
         self.config = config
 
     def set_session(
-        self, token: SignInOutputData, response: Response
+        self, token: AccessTokenData, response: Response
     ) -> Response:
         jwt_token = self.token_processor.encode(token)
 
@@ -26,3 +27,15 @@ class TokenAuth:
         )
 
         return response
+
+    def get_access_token(self) -> AccessTokenData:
+        cookies = self.request.cookies
+        token_key = self.config.token_cookies_key
+        cookies_token = cookies.get(token_key)
+
+        if not cookies_token:
+            raise UnauthorizedError()
+
+        token = self.token_processor.decode(cookies_token)
+
+        return token

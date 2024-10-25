@@ -47,6 +47,10 @@ class UserReader(Protocol):
         raise NotImplementedError
 
     @abstractmethod
+    async def by_email(self, email: UserEmail) -> UserDetail | None:
+        raise NotImplementedError
+
+    @abstractmethod
     async def get_users(
         self, filters: UserFilters, pagination: Pagination
     ) -> list[UserDetail]:
