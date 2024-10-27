@@ -93,6 +93,9 @@ class UserRawPassword:
             if not password_validator(self.password):
                 raise WeakPasswordError(message)
 
+    def to_raw(self):
+        return self.password
+
 
 @dataclass(slots=True, frozen=True, eq=True, unsafe_hash=True)
 class ExpiresIn:
