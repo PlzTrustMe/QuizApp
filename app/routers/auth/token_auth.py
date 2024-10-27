@@ -39,3 +39,6 @@ class TokenAuth:
         token = self.token_processor.decode(cookies_token)
 
         return token
+
+    def get_token_data(self, token: str) -> AccessTokenData:
+        return self.token_processor.decode_oauth(token)

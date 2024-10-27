@@ -38,3 +38,18 @@ class AccessTokenProcessor:
             raise UnauthorizedError from exc
         else:
             return data
+
+    def decode_oauth(self, token: JWTToken) -> AccessTokenData:
+        try:
+            payload = self.jwt_processor.decode_oauth(token)
+
+            email = str(payload["email"])
+            expires_in = datetime.fromtimestamp(float(payload["exp"]), UTC)
+
+            data = AccessTokenData(email=email, expires_in=expires_in)
+        except JWTExpiredError as exc:
+            raise AccessTokenIsExpiredError from exc
+        except (JWTDecodeError, ValueError, TypeError, KeyError) as exc:
+            raise UnauthorizedError from exc
+        else:
+            return data

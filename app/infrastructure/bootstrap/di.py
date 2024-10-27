@@ -14,6 +14,7 @@ from fastapi import Request
 from app.core.commands.delete_user import DeleteUser
 from app.core.commands.edit_full_name import EditFullName
 from app.core.commands.sign_in import AccessTokenData, SignIn
+from app.core.commands.sign_in_by_oauth import SignInByOauth
 from app.core.commands.sign_up import SignUp
 from app.core.common.commiter import Commiter
 from app.core.interfaces.id_provider import IdProvider
@@ -28,7 +29,7 @@ from app.infrastructure.auth.password_hasher import ArgonPasswordHasher
 from app.infrastructure.bootstrap.configs import load_all_configs
 from app.infrastructure.cache.config import RedisConfig
 from app.infrastructure.cache.provider import get_redis
-from app.infrastructure.jwt.config import JWTConfig
+from app.infrastructure.jwt.config import Auth0Config, JWTConfig
 from app.infrastructure.jwt.jwt_processor import JWTProcessor, PyJWTProcessor
 from app.infrastructure.persistence.commiter import SACommiter
 from app.infrastructure.persistence.config import DBConfig
@@ -76,6 +77,7 @@ def interactor_provider() -> Provider:
 
     provider.provide(SignUp, scope=Scope.REQUEST)
     provider.provide(SignIn, scope=Scope.REQUEST)
+    provider.provide(SignInByOauth, scope=Scope.REQUEST)
     provider.provide(GetMe, scope=Scope.REQUEST)
     provider.provide(EditFullName, scope=Scope.REQUEST)
     provider.provide(DeleteUser, scope=Scope.REQUEST)
@@ -126,6 +128,9 @@ def config_provider() -> Provider:
     provider.provide(lambda: config.jwt, scope=Scope.APP, provides=JWTConfig)
     provider.provide(
         lambda: config.token_auth, scope=Scope.APP, provides=TokenAuthConfig
+    )
+    provider.provide(
+        lambda: config.auth0, scope=Scope.APP, provides=Auth0Config
     )
 
     return provider

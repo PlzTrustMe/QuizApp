@@ -15,10 +15,12 @@ users_table = sa.Table(
         unique=True,
         autoincrement=True,
     ),
-    sa.Column("first_name", sa.String(length=15), nullable=False),
-    sa.Column("last_name", sa.String(length=15), nullable=False),
+    sa.Column("first_name", sa.String(length=15), nullable=True, default=None),
+    sa.Column("last_name", sa.String(length=15), nullable=True, default=None),
     sa.Column("user_email", sa.String(length=60), nullable=False, unique=True),
-    sa.Column("hashed_password", sa.String(length=256), nullable=False),
+    sa.Column(
+        "hashed_password", sa.String(length=256), nullable=True, default=None
+    ),
     sa.Column("is_active", sa.Boolean(), nullable=False, default=False),
     sa.Column(
         "created_at",
