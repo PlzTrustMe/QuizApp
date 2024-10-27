@@ -11,7 +11,12 @@ from app.core.commands.edit_full_name import (
     EditFullNameInputData,
     EditFullNameOutputData,
 )
-from app.core.commands.errors import PasswordMismatchError, UserNotFoundError
+from app.core.commands.errors import (
+    AccessTokenIsExpiredError,
+    PasswordMismatchError,
+    UnauthorizedError,
+    UserNotFoundError,
+)
 from app.core.commands.sign_in import AccessTokenData, SignIn, SignInInputData
 from app.core.commands.sign_up import (
     SignUp,
@@ -107,10 +112,22 @@ async def sign_in(
     return token_auth.set_session(access_token_data, response)
 
 
-@user_router.get("/me")
-async def get_me(action: FromDishka[GetMe]) -> UserDetail:
+@user_router.get(
+    "/me",
+    status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_200_OK: {"model": UserDetail},
+        status.HTTP_401_UNAUTHORIZED: {
+            "model": ErrorResponse[
+                UnauthorizedError | AccessTokenIsExpiredError
+            ]
+        },
+    },
+)
+async def get_me(action: FromDishka[GetMe]) -> OkResponse[UserDetail]:
     response = await action()
-    return response
+
+    return OkResponse(result=response)
 
 
 @user_router.put(
