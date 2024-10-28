@@ -1,5 +1,6 @@
 from app.core.common.pagination import Pagination
 from app.core.entities.user import User, UserId
+from app.core.entities.value_objects import UserEmail
 from app.core.interfaces.user_gateways import (
     UserDetail,
     UserFilters,
@@ -29,6 +30,11 @@ class FakeUserMapper(UserGateway):
             return None
         return self.user
 
+    async def by_email(self, email: UserEmail) -> User | None:
+        if self.user.email != email:
+            return None
+        return self.user
+
     async def delete(self, user_id: UserId) -> None:
         if self.user.user_id == user_id:
             self.deleted = True
@@ -53,6 +59,12 @@ class FakeUserReader(UserReader):
     async def by_id(self, user_id: UserId) -> UserDetail | None:
         for user in self.users:
             if user.user_id == user_id:
+                return self._map_to_dto(user)
+        return None
+
+    async def by_email(self, email: UserEmail) -> UserDetail | None:
+        for user in self.users:
+            if user.email == email:
                 return self._map_to_dto(user)
         return None
 

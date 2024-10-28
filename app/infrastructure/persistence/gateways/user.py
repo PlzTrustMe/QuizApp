@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.commands.errors import UnexpectedError
 from app.core.common.pagination import Pagination, SortOrder
 from app.core.entities.user import User, UserId
+from app.core.entities.value_objects import UserEmail
 from app.core.interfaces.user_gateways import (
     UserDetail,
     UserFilters,
@@ -42,6 +43,13 @@ class UserMapper(UserGateway):
 
         return result.scalar_one_or_none()
 
+    async def by_email(self, email: UserEmail) -> User | None:
+        query = select(User).where(users_table.c.user_email == email.to_row())
+
+        result = await self.session.execute(query)
+
+        return result.scalar_one_or_none()
+
     async def delete(self, user_id: UserId) -> None:
         query = delete(User).where(users_table.c.user_id == user_id)
 
@@ -72,6 +80,20 @@ class SQLAlchemyUserReader(UserReader):
             users_table.c.first_name,
             users_table.c.last_name,
         ).where(users_table.c.user_id == user_id)
+
+        result = await self.session.execute(query)
+
+        row = result.mappings().one_or_none()
+
+        return None if not row else self._load_user(row)
+
+    async def by_email(self, email: UserEmail) -> UserDetail | None:
+        query = select(
+            users_table.c.user_id,
+            users_table.c.user_email,
+            users_table.c.first_name,
+            users_table.c.last_name,
+        ).where(users_table.c.user_email == email.to_row())
 
         result = await self.session.execute(query)
 

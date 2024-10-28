@@ -9,7 +9,7 @@ UserId = NewType("UserId", int)
 @dataclass
 class User:
     user_id: UserId | None
-    full_name: FullName
+    full_name: FullName | None
     email: UserEmail
-    hashed_password: str
+    hashed_password: str | None
     is_active: bool = True

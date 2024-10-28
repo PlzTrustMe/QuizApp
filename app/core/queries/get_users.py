@@ -1,4 +1,3 @@
-import asyncio
 import logging
 from dataclasses import dataclass
 
@@ -27,10 +26,8 @@ class GetUsers:
     user_reader: UserReader
 
     async def __call__(self, data: GetUsersInputData) -> GetUsersOutputData:
-        total = await asyncio.create_task(self.user_reader.total(data.filters))
-        users = await asyncio.create_task(
-            self.user_reader.get_users(data.filters, data.pagination)
-        )
+        total = await self.user_reader.total(data.filters)
+        users = await self.user_reader.get_users(data.filters, data.pagination)
 
         logging.info("Get users, total=%s", total)
 
