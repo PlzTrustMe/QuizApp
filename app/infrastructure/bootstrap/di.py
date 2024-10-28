@@ -12,6 +12,7 @@ from dishka import (
 from fastapi import Request
 
 from app.core.commands.delete_user import DeleteUser
+from app.core.commands.edit_email import EditEmail
 from app.core.commands.edit_full_name import EditFullName
 from app.core.commands.edit_password import EditPassword
 from app.core.commands.sign_in import AccessTokenData, SignIn
@@ -83,6 +84,7 @@ def interactor_provider() -> Provider:
     provider.provide(GetMe, scope=Scope.REQUEST)
     provider.provide(EditFullName, scope=Scope.REQUEST)
     provider.provide(EditPassword, scope=Scope.REQUEST)
+    provider.provide(EditEmail, scope=Scope.REQUEST)
     provider.provide(DeleteUser, scope=Scope.REQUEST)
     provider.provide(GetUserById, scope=Scope.REQUEST)
     provider.provide(GetUsers, scope=Scope.REQUEST)

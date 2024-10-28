@@ -7,6 +7,7 @@ from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBearer
 
 from app.core.commands.delete_user import DeleteUser, DeleteUserInputData
+from app.core.commands.edit_email import EditEmail, EditEmailInputData
 from app.core.commands.edit_full_name import (
     EditFullName,
     EditFullNameInputData,
@@ -18,6 +19,7 @@ from app.core.commands.errors import (
     AccessTokenIsExpiredError,
     PasswordMismatchError,
     UnauthorizedError,
+    UserEmailAlreadyExistError,
     UserNotFoundError,
 )
 from app.core.commands.sign_in import SignIn, SignInInputData
@@ -51,6 +53,7 @@ from app.routers.responses.base import ErrorResponse, OkResponse
 from app.schemas.user import (
     SignInSchema,
     SignUpSchema,
+    UserUpdateEmail,
     UserUpdateFullNameSchema,
     UserUpdatePassword,
 )
@@ -75,6 +78,9 @@ user_router = APIRouter(
         },
         status.HTTP_422_UNPROCESSABLE_ENTITY: {
             "model": ErrorResponse[InvalidUserEmailError | WeakPasswordError]
+        },
+        status.HTTP_409_CONFLICT: {
+            "model": ErrorResponse[UserEmailAlreadyExistError]
         },
     },
 )
@@ -217,6 +223,26 @@ async def edit_password(
             new_password=body.new_password,
         )
     )
+
+    return OkResponse()
+
+
+@user_router.put(
+    "/{user_id}/email",
+    status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_200_OK: {"model": OkResponse},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[UserNotFoundError]},
+        status.HTTP_422_UNPROCESSABLE_ENTITY: {
+            "model": ErrorResponse[InvalidUserEmailError]
+        },
+        status.HTTP_403_FORBIDDEN: {"model": ErrorResponse[AccessDeniedError]},
+    },
+)
+async def edit_email(
+    user_id: int, body: UserUpdateEmail, action: FromDishka[EditEmail]
+) -> OkResponse:
+    await action(EditEmailInputData(user_id=user_id, new_email=body.new_email))
 
     return OkResponse()
 

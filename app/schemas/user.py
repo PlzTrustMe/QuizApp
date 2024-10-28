@@ -33,3 +33,7 @@ class UserUpdateFullNameSchema(BaseModel):
 class UserUpdatePassword(BaseModel):
     old_password: str
     new_password: str
+
+
+class UserUpdateEmail(BaseModel):
+    new_email: str

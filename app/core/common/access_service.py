@@ -18,3 +18,9 @@ class AccessService:
 
     async def ensure_can_edit_password(self, record_to_edit: User):
         await self._is_identity(record_to_edit)
+
+    async def ensure_can_edit_email(self, record_to_edit: User):
+        actor = await self.id_provider.get_user()
+
+        if actor.user_id == record_to_edit.user_id:
+            raise AccessDeniedError()
