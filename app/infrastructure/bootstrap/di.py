@@ -13,6 +13,7 @@ from fastapi import Request
 
 from app.core.commands.delete_user import DeleteUser
 from app.core.commands.edit_full_name import EditFullName
+from app.core.commands.edit_password import EditPassword
 from app.core.commands.sign_in import AccessTokenData, SignIn
 from app.core.commands.sign_in_by_oauth import SignInByOauth
 from app.core.commands.sign_up import SignUp
@@ -81,6 +82,7 @@ def interactor_provider() -> Provider:
     provider.provide(SignInByOauth, scope=Scope.REQUEST)
     provider.provide(GetMe, scope=Scope.REQUEST)
     provider.provide(EditFullName, scope=Scope.REQUEST)
+    provider.provide(EditPassword, scope=Scope.REQUEST)
     provider.provide(DeleteUser, scope=Scope.REQUEST)
     provider.provide(GetUserById, scope=Scope.REQUEST)
     provider.provide(GetUsers, scope=Scope.REQUEST)

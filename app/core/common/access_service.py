@@ -7,8 +7,14 @@ class AccessService:
     def __init__(self, id_provider: IdProvider):
         self.id_provider = id_provider
 
-    async def ensure_can_edit_full_name(self, record_to_edit: User):
+    async def _is_identity(self, record_to_edit: User):
         actor = await self.id_provider.get_user()
 
         if record_to_edit.user_id != actor.user_id:
             raise AccessDeniedError()
+
+    async def ensure_can_edit_full_name(self, record_to_edit: User):
+        await self._is_identity(record_to_edit)
+
+    async def ensure_can_edit_password(self, record_to_edit: User):
+        await self._is_identity(record_to_edit)

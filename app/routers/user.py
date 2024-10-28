@@ -12,6 +12,7 @@ from app.core.commands.edit_full_name import (
     EditFullNameInputData,
     EditFullNameOutputData,
 )
+from app.core.commands.edit_password import EditPassword, EditPasswordInputData
 from app.core.commands.errors import (
     AccessDeniedError,
     AccessTokenIsExpiredError,
@@ -51,6 +52,7 @@ from app.schemas.user import (
     SignInSchema,
     SignUpSchema,
     UserUpdateFullNameSchema,
+    UserUpdatePassword,
 )
 
 user_router = APIRouter(
@@ -188,6 +190,35 @@ async def edit_full_name(
     )
 
     return OkResponse(result=response)
+
+
+@user_router.put(
+    "/{user_id}/password",
+    status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_200_OK: {"model": OkResponse},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[UserNotFoundError]},
+        status.HTTP_400_BAD_REQUEST: {
+            "model": ErrorResponse[PasswordMismatchError]
+        },
+        status.HTTP_422_UNPROCESSABLE_ENTITY: {
+            "model": ErrorResponse[WeakPasswordError]
+        },
+        status.HTTP_403_FORBIDDEN: {"model": ErrorResponse[AccessDeniedError]},
+    },
+)
+async def edit_password(
+    user_id: int, body: UserUpdatePassword, action: FromDishka[EditPassword]
+) -> OkResponse:
+    await action(
+        EditPasswordInputData(
+            user_id=user_id,
+            old_password=body.old_password,
+            new_password=body.new_password,
+        )
+    )
+
+    return OkResponse()
 
 
 @user_router.delete(
