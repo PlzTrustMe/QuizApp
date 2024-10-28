@@ -31,7 +31,7 @@ class Company:
 
 @dataclass
 class CompanyUser:
-    company_user_id: CompanyUserId
+    company_user_id: CompanyUserId | None
     company_id: CompanyId
     user_id: UserId
     role: CompanyRole

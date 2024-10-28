@@ -1,4 +1,5 @@
-from .company import map_companies_table, map_company_users_table
+from .company import map_companies_table
+from .company_user import map_company_users_table
 from .user import map_users_table
 
 

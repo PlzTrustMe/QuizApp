@@ -56,7 +56,7 @@ from app.schemas.user import (
     SignInSchema,
     SignUpSchema,
     UserUpdateFullNameSchema,
-    UserUpdatePassword,
+    UserUpdatePasswordSchema,
 )
 
 user_router = APIRouter(
@@ -215,7 +215,9 @@ async def edit_full_name(
     },
 )
 async def edit_password(
-    user_id: int, body: UserUpdatePassword, action: FromDishka[EditPassword]
+    user_id: int,
+    body: UserUpdatePasswordSchema,
+    action: FromDishka[EditPassword],
 ) -> OkResponse:
     await action(
         EditPasswordInputData(

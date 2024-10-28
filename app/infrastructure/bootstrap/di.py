@@ -11,6 +11,7 @@ from dishka import (
 )
 from fastapi import Request
 
+from app.core.commands.company.create_company import CreateCompany
 from app.core.commands.user.delete_user import DeleteUser
 from app.core.commands.user.edit_full_name import EditFullName
 from app.core.commands.user.edit_password import EditPassword
@@ -19,6 +20,10 @@ from app.core.commands.user.sign_in_by_oauth import SignInByOauth
 from app.core.commands.user.sign_up import SignUp
 from app.core.common.access_service import AccessService
 from app.core.common.commiter import Commiter
+from app.core.interfaces.company_gateways import (
+    CompanyGateway,
+    CompanyUserGateway,
+)
 from app.core.interfaces.id_provider import IdProvider
 from app.core.interfaces.password_hasher import PasswordHasher
 from app.core.interfaces.user_gateways import UserGateway, UserReader
@@ -35,6 +40,10 @@ from app.infrastructure.jwt.config import Auth0Config, JWTConfig
 from app.infrastructure.jwt.jwt_processor import JWTProcessor, PyJWTProcessor
 from app.infrastructure.persistence.commiter import SACommiter
 from app.infrastructure.persistence.config import DBConfig
+from app.infrastructure.persistence.gateways.company import (
+    CompanyMapper,
+    CompanyUserMapper,
+)
 from app.infrastructure.persistence.gateways.user import (
     SQLAlchemyUserReader,
     UserMapper,
@@ -54,6 +63,13 @@ def gateway_provider() -> Provider:
     provider.provide(UserMapper, scope=Scope.REQUEST, provides=UserGateway)
     provider.provide(
         SQLAlchemyUserReader, scope=Scope.REQUEST, provides=UserReader
+    )
+
+    provider.provide(
+        CompanyMapper, scope=Scope.REQUEST, provides=CompanyGateway
+    )
+    provider.provide(
+        CompanyUserMapper, scope=Scope.REQUEST, provides=CompanyUserGateway
     )
 
     provider.provide(
@@ -86,6 +102,8 @@ def interactor_provider() -> Provider:
     provider.provide(DeleteUser, scope=Scope.REQUEST)
     provider.provide(GetUserById, scope=Scope.REQUEST)
     provider.provide(GetUsers, scope=Scope.REQUEST)
+
+    provider.provide(CreateCompany, scope=Scope.REQUEST)
 
     return provider
 
