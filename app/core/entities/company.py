@@ -3,6 +3,7 @@ from enum import Enum, auto
 from typing import NewType
 
 from app.core.entities.user import UserId
+from app.core.entities.value_objects import CompanyDescription, CompanyName
 
 CompanyId = NewType("CompanyId", int)
 
@@ -16,6 +17,6 @@ class Visibility(Enum):
 class Company:
     company_id: CompanyId | None
     owner_id: UserId
-    name: str
-    description: str
+    name: CompanyName
+    description: CompanyDescription
     visibility: Visibility
