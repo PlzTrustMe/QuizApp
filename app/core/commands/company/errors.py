@@ -10,3 +10,12 @@ class CompanyWithNameAlreadyExistError(ApplicationError):
     @property
     def message(self) -> str:
         return f"Company with name {self.name} already exist"
+
+
+@dataclass(eq=False)
+class CompanyNotFoundError(ApplicationError):
+    company_id: int
+
+    @property
+    def message(self) -> str:
+        return f"Company with id {self.company_id} not found"

@@ -35,6 +35,11 @@ class FakeCompanyMapper(CompanyGateway):
     async def is_exist(self, name: CompanyName) -> bool:
         return self.company.name == name
 
+    async def by_id(self, company_id: CompanyId) -> Company | None:
+        if self.company.company_id == company_id:
+            return self.company
+        return None
+
 
 class FakeCompanyUserMapper(CompanyUserGateway):
     def __init__(self):

@@ -3,7 +3,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.commands.user.errors import UnexpectedError
-from app.core.entities.company import Company, CompanyUser
+from app.core.entities.company import Company, CompanyId, CompanyUser
 from app.core.entities.value_objects import CompanyName
 from app.core.interfaces.company_gateways import (
     CompanyGateway,
@@ -32,6 +32,15 @@ class CompanyMapper(CompanyGateway):
         result = await self.session.execute(query)
 
         return result.scalar()
+
+    async def by_id(self, company_id: CompanyId) -> Company | None:
+        query = select(Company).where(
+            companies_table.c.company_id == company_id
+        )
+
+        result = await self.session.execute(query)
+
+        return result.scalar_one_or_none()
 
 
 class CompanyUserMapper(CompanyUserGateway):
