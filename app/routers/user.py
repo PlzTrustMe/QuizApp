@@ -13,6 +13,7 @@ from app.core.commands.edit_full_name import (
     EditFullNameOutputData,
 )
 from app.core.commands.errors import (
+    AccessDeniedError,
     AccessTokenIsExpiredError,
     PasswordMismatchError,
     UnauthorizedError,
@@ -170,6 +171,7 @@ async def get_me(action: FromDishka[GetMe]) -> OkResponse[UserDetail]:
                 FirstNameTooLongError | LastNameTooLongError | EmptyError
             ]
         },
+        status.HTTP_403_FORBIDDEN: {"model": ErrorResponse[AccessDeniedError]},
     },
 )
 async def edit_full_name(

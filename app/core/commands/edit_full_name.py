@@ -2,6 +2,7 @@ import logging
 from dataclasses import dataclass
 
 from app.core.commands.errors import UserNotFoundError
+from app.core.common.access_service import AccessService
 from app.core.common.commiter import Commiter
 from app.core.entities.user import UserId
 from app.core.interfaces.user_gateways import UserGateway
@@ -22,6 +23,7 @@ class EditFullNameOutputData:
 @dataclass
 class EditFullName:
     user_gateway: UserGateway
+    access_service: AccessService
     commiter: Commiter
 
     async def __call__(
@@ -30,6 +32,8 @@ class EditFullName:
         user = await self.user_gateway.by_id(UserId(data.user_id))
         if not user:
             raise UserNotFoundError(data.user_id)
+
+        await self.access_service.ensure_can_edit_full_name(user)
 
         user.full_name = user.full_name.edit(data.first_name, data.last_name)
 

@@ -6,6 +6,7 @@ from app.core.commands.edit_full_name import (
     EditFullNameOutputData,
 )
 from app.core.commands.errors import UserNotFoundError
+from app.core.common.access_service import AccessService
 from app.core.entities.value_objects import FullName
 from tests.mocks.commiter import FakeCommiter
 from tests.mocks.user_gateways import FakeUserMapper
@@ -16,13 +17,14 @@ from tests.mocks.user_gateways import FakeUserMapper
 )
 async def test_full_name(
     user_gateway: FakeUserMapper,
+    access_service: AccessService,
     commiter: FakeCommiter,
     user_id: int,
     exc_class,
 ) -> None:
     full_name = FullName("NewTest", "NewTestovich")
 
-    command = EditFullName(user_gateway, commiter)
+    command = EditFullName(user_gateway, access_service, commiter)
     input_data = EditFullNameInputData(user_id, "NewTest", "NewTestovich")
 
     coro = command(input_data)

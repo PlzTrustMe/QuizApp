@@ -9,6 +9,7 @@ from app.core.entities.value_objects import (
 )
 from app.core.interfaces.password_hasher import PasswordHasher
 from app.infrastructure.auth.password_hasher import ArgonPasswordHasher
+from tests.mocks.id_provider import FakeIdProvider
 
 
 @pytest.fixture
@@ -47,3 +48,8 @@ def user(
     hashed_password = password_hasher.hash_password(user_pwd)
 
     return User(user_fake_id, user_full_name, user_email, hashed_password)
+
+
+@pytest.fixture
+def id_provider(user: User) -> FakeIdProvider:
+    return FakeIdProvider(user)
