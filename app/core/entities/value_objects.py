@@ -45,6 +45,9 @@ class CompanyDescription:
         if len(self.value) > max_length:
             raise CompanyDescriptionTooLongError(self.value)
 
+    def to_raw(self):
+        return self.value
+
 
 @dataclass(slots=True, frozen=True, eq=True, unsafe_hash=True)
 class FullName:
