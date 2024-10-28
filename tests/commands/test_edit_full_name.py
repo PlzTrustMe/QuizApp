@@ -1,11 +1,11 @@
 import pytest
 
-from app.core.commands.edit_full_name import (
+from app.core.commands.user.edit_full_name import (
     EditFullName,
     EditFullNameInputData,
     EditFullNameOutputData,
 )
-from app.core.commands.errors import UserNotFoundError
+from app.core.commands.user.errors import UserNotFoundError
 from app.core.common.access_service import AccessService
 from app.core.entities.value_objects import FullName
 from tests.mocks.commiter import FakeCommiter

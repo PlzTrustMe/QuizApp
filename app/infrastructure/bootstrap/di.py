@@ -11,12 +11,12 @@ from dishka import (
 )
 from fastapi import Request
 
-from app.core.commands.delete_user import DeleteUser
-from app.core.commands.edit_full_name import EditFullName
-from app.core.commands.edit_password import EditPassword
-from app.core.commands.sign_in import AccessTokenData, SignIn
-from app.core.commands.sign_in_by_oauth import SignInByOauth
-from app.core.commands.sign_up import SignUp
+from app.core.commands.user.delete_user import DeleteUser
+from app.core.commands.user.edit_full_name import EditFullName
+from app.core.commands.user.edit_password import EditPassword
+from app.core.commands.user.sign_in import AccessTokenData, SignIn
+from app.core.commands.user.sign_in_by_oauth import SignInByOauth
+from app.core.commands.user.sign_up import SignUp
 from app.core.common.access_service import AccessService
 from app.core.common.commiter import Commiter
 from app.core.interfaces.id_provider import IdProvider

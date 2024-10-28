@@ -1,4 +1,4 @@
-from app.core.commands.errors import AccessDeniedError
+from app.core.commands.user.errors import AccessDeniedError
 from app.core.entities.user import User
 from app.core.interfaces.id_provider import IdProvider
 

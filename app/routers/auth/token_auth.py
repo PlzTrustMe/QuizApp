@@ -1,7 +1,7 @@
 from fastapi import Request, Response
 
-from app.core.commands.errors import UnauthorizedError
-from app.core.commands.sign_in import AccessTokenData
+from app.core.commands.user.errors import UnauthorizedError
+from app.core.commands.user.sign_in import AccessTokenData
 from app.infrastructure.auth.access_token_processor import AccessTokenProcessor
 from app.routers.auth.config import TokenAuthConfig
 

@@ -1,6 +1,6 @@
 import pytest
 
-from app.core.commands.errors import UserNotFoundError
+from app.core.commands.user.errors import UserNotFoundError
 from app.core.interfaces.user_gateways import UserDetail
 from app.core.queries.get_user import GetUserById, GetUserByIdInputData
 from tests.mocks.user_gateways import FakeUserReader

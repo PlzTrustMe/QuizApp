@@ -5,7 +5,7 @@ from typing import Awaitable, Callable
 from fastapi import FastAPI, status
 from starlette.requests import Request
 
-from app.core.commands.errors import (
+from app.core.commands.user.errors import (
     AccessDeniedError,
     AccessTokenIsExpiredError,
     PasswordMismatchError,

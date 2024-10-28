@@ -1,7 +1,13 @@
 import pytest
 
-from app.core.commands.edit_password import EditPassword, EditPasswordInputData
-from app.core.commands.errors import PasswordMismatchError, UserNotFoundError
+from app.core.commands.user.edit_password import (
+    EditPassword,
+    EditPasswordInputData,
+)
+from app.core.commands.user.errors import (
+    PasswordMismatchError,
+    UserNotFoundError,
+)
 from app.core.common.access_service import AccessService
 from app.core.entities.value_objects import UserRawPassword
 from app.core.interfaces.password_hasher import PasswordHasher
