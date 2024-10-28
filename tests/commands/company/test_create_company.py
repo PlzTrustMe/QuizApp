@@ -5,11 +5,6 @@ from app.core.commands.company.create_company import (
     CreateCompanyInputData,
 )
 from app.core.commands.company.errors import CompanyWithNameAlreadyExistError
-from app.core.entities.errors import (
-    CompanyDescriptionTooLongError,
-    CompanyNameTooLongError,
-    EmptyError,
-)
 from tests.mocks.commiter import FakeCommiter
 from tests.mocks.company_gateways import (
     FakeCompanyMapper,
@@ -22,9 +17,6 @@ from tests.mocks.id_provider import FakeIdProvider
     ["name", "desc", "exc_class"],
     [
         ("NewTest", "", None),
-        ("", "", EmptyError),
-        ("Test" * 15, "", CompanyNameTooLongError),
-        ("Test", "A" * 129, CompanyDescriptionTooLongError),
         ("NewTestCompany", "", CompanyWithNameAlreadyExistError),
     ],
 )

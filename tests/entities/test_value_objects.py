@@ -1,6 +1,8 @@
 import pytest
 
 from app.core.entities.errors import (
+    CompanyDescriptionTooLongError,
+    CompanyNameTooLongError,
     EmptyError,
     FirstNameTooLongError,
     InvalidUserEmailError,
@@ -8,6 +10,8 @@ from app.core.entities.errors import (
     WeakPasswordError,
 )
 from app.core.entities.value_objects import (
+    CompanyDescription,
+    CompanyName,
     FullName,
     UserEmail,
     UserRawPassword,
@@ -64,3 +68,23 @@ def test_create_user_bad_email(email):
 def test_create_user_bad_password(pwd):
     with pytest.raises(WeakPasswordError):
         UserRawPassword(pwd)
+
+
+@pytest.mark.parametrize(
+    ["name", "exc_class"],
+    [
+        ("", EmptyError),
+        ("Test" * 15, CompanyNameTooLongError),
+    ],
+)
+def test_company_name(name: str, exc_class) -> None:
+    with pytest.raises(exc_class):
+        CompanyName(name)
+
+
+@pytest.mark.parametrize(
+    ["desc", "exc_class"], [("A" * 129, CompanyDescriptionTooLongError)]
+)
+def test_company_desc(desc: str, exc_class) -> None:
+    with pytest.raises(exc_class):
+        CompanyDescription(desc)
