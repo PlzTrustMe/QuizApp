@@ -1,4 +1,4 @@
-from sqlalchemy import exists, select
+from sqlalchemy import delete, exists, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -41,6 +41,13 @@ class CompanyMapper(CompanyGateway):
         result = await self.session.execute(query)
 
         return result.scalar_one_or_none()
+
+    async def delete(self, company_id: CompanyId) -> None:
+        query = delete(Company).where(
+            companies_table.c.company_id == company_id
+        )
+
+        await self.session.execute(query)
 
 
 class CompanyUserMapper(CompanyUserGateway):

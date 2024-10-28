@@ -24,6 +24,7 @@ class FakeCompanyMapper(CompanyGateway):
             visibility=Visibility.VISIBLE,
         )
         self.saved = False
+        self.deleted = False
 
     async def add(self, company: Company) -> None:
         self.company.name = company.name
@@ -39,6 +40,10 @@ class FakeCompanyMapper(CompanyGateway):
         if self.company.company_id == company_id:
             return self.company
         return None
+
+    async def delete(self, company_id: CompanyId) -> None:
+        if self.company.company_id == company_id:
+            self.deleted = True
 
 
 class FakeCompanyUserMapper(CompanyUserGateway):

@@ -18,6 +18,10 @@ class CompanyGateway(Protocol):
     async def by_id(self, company_id: CompanyId) -> Company | None:
         raise NotImplementedError
 
+    @abstractmethod
+    async def delete(self, company_id: CompanyId) -> None:
+        raise NotImplementedError
+
 
 class CompanyUserGateway(Protocol):
     @abstractmethod
