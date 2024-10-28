@@ -253,6 +253,7 @@ async def edit_email(
     responses={
         status.HTTP_200_OK: {"model": OkResponse},
         status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[UserNotFoundError]},
+        status.HTTP_403_FORBIDDEN: {"model": ErrorResponse[AccessDeniedError]},
     },
 )
 async def delete_user(

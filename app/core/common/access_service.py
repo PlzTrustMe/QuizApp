@@ -24,3 +24,6 @@ class AccessService:
 
         if actor.user_id == record_to_edit.user_id:
             raise AccessDeniedError()
+
+    async def ensure_can_delete_user(self, record_to_edit: User):
+        await self._is_identity(record_to_edit)
