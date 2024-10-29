@@ -2,6 +2,7 @@ import pytest
 
 from app.core.commands.delete_user import DeleteUser, DeleteUserInputData
 from app.core.commands.errors import UserNotFoundError
+from app.core.common.access_service import AccessService
 from tests.mocks.commiter import FakeCommiter
 from tests.mocks.user_gateways import FakeUserMapper
 
@@ -12,10 +13,11 @@ from tests.mocks.user_gateways import FakeUserMapper
 async def test_delete_user(
     user_gateway: FakeUserMapper,
     commiter: FakeCommiter,
+    access_service: AccessService,
     user_id: int,
     exc_class,
 ) -> None:
-    command = DeleteUser(user_gateway, commiter)
+    command = DeleteUser(user_gateway, commiter, access_service)
     input_data = DeleteUserInputData(user_id)
 
     coro = command(input_data)

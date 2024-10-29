@@ -56,3 +56,10 @@ class UnauthorizedError(ApplicationError):
     @property
     def message(self) -> str:
         return "Unauthorized"
+
+
+@dataclass(eq=False)
+class AccessDeniedError(ApplicationError):
+    @property
+    def message(self) -> str:
+        return "Access denied"

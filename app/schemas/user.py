@@ -28,3 +28,12 @@ class SignInSchema(BaseModel):
 class UserUpdateFullNameSchema(BaseModel):
     first_name: str
     last_name: str
+
+
+class UserUpdatePassword(BaseModel):
+    old_password: str
+    new_password: str
+
+
+class UserUpdateEmail(BaseModel):
+    new_email: str

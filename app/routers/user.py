@@ -12,10 +12,13 @@ from app.core.commands.edit_full_name import (
     EditFullNameInputData,
     EditFullNameOutputData,
 )
+from app.core.commands.edit_password import EditPassword, EditPasswordInputData
 from app.core.commands.errors import (
+    AccessDeniedError,
     AccessTokenIsExpiredError,
     PasswordMismatchError,
     UnauthorizedError,
+    UserEmailAlreadyExistError,
     UserNotFoundError,
 )
 from app.core.commands.sign_in import SignIn, SignInInputData
@@ -50,6 +53,7 @@ from app.schemas.user import (
     SignInSchema,
     SignUpSchema,
     UserUpdateFullNameSchema,
+    UserUpdatePassword,
 )
 
 user_router = APIRouter(
@@ -72,6 +76,9 @@ user_router = APIRouter(
         },
         status.HTTP_422_UNPROCESSABLE_ENTITY: {
             "model": ErrorResponse[InvalidUserEmailError | WeakPasswordError]
+        },
+        status.HTTP_409_CONFLICT: {
+            "model": ErrorResponse[UserEmailAlreadyExistError]
         },
     },
 )
@@ -170,6 +177,7 @@ async def get_me(action: FromDishka[GetMe]) -> OkResponse[UserDetail]:
                 FirstNameTooLongError | LastNameTooLongError | EmptyError
             ]
         },
+        status.HTTP_403_FORBIDDEN: {"model": ErrorResponse[AccessDeniedError]},
     },
 )
 async def edit_full_name(
@@ -188,12 +196,42 @@ async def edit_full_name(
     return OkResponse(result=response)
 
 
+@user_router.put(
+    "/{user_id}/password",
+    status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_200_OK: {"model": OkResponse},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[UserNotFoundError]},
+        status.HTTP_400_BAD_REQUEST: {
+            "model": ErrorResponse[PasswordMismatchError]
+        },
+        status.HTTP_422_UNPROCESSABLE_ENTITY: {
+            "model": ErrorResponse[WeakPasswordError]
+        },
+        status.HTTP_403_FORBIDDEN: {"model": ErrorResponse[AccessDeniedError]},
+    },
+)
+async def edit_password(
+    user_id: int, body: UserUpdatePassword, action: FromDishka[EditPassword]
+) -> OkResponse:
+    await action(
+        EditPasswordInputData(
+            user_id=user_id,
+            old_password=body.old_password,
+            new_password=body.new_password,
+        )
+    )
+
+    return OkResponse()
+
+
 @user_router.delete(
     "/{user_id}",
     status_code=status.HTTP_200_OK,
     responses={
         status.HTTP_200_OK: {"model": OkResponse},
         status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[UserNotFoundError]},
+        status.HTTP_403_FORBIDDEN: {"model": ErrorResponse[AccessDeniedError]},
     },
 )
 async def delete_user(
