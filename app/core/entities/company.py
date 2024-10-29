@@ -9,9 +9,9 @@ CompanyId = NewType("CompanyId", int)
 CompanyUserId = NewType("CompanyUserId", int)
 
 
-class Visibility(Enum):
-    HIDDEN = auto()
-    VISIBLE = auto()
+class Visibility(str, Enum):
+    HIDDEN = "hidden"
+    VISIBLE = "visible"
 
 
 class CompanyRole(Enum):

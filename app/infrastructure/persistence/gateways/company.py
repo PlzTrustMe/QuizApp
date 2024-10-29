@@ -59,7 +59,7 @@ class CompanyUserMapper(CompanyUserGateway):
         self.session = session
 
     async def add(self, company_user: CompanyUser) -> None:
-        self.session.add(CompanyUser)
+        self.session.add(company_user)
 
         try:
             await self.session.flush()
@@ -129,7 +129,7 @@ class SQLAlchemyCompanyReader(CompanyReader):
         return [self._load_company(row) for row in result.mappings()]
 
     async def total(self, filters: CompanyFilters) -> int:
-        query = select(func.count(companies_table.c.user_id))
+        query = select(func.count(companies_table.c.company_id))
 
         if filters:
             query = self._make_filters(query, filters)

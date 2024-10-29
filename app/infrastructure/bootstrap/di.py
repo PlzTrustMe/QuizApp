@@ -12,6 +12,14 @@ from dishka import (
 from fastapi import Request
 
 from app.core.commands.company.create_company import CreateCompany
+from app.core.commands.company.delete_company import DeleteCompany
+from app.core.commands.company.edit_company_description import (
+    EditCompanyDescription,
+)
+from app.core.commands.company.edit_company_name import EditCompanyName
+from app.core.commands.company.edit_company_visibility import (
+    EditCompanyVisibility,
+)
 from app.core.commands.user.delete_user import DeleteUser
 from app.core.commands.user.edit_full_name import EditFullName
 from app.core.commands.user.edit_password import EditPassword
@@ -28,6 +36,8 @@ from app.core.interfaces.company_gateways import (
 from app.core.interfaces.id_provider import IdProvider
 from app.core.interfaces.password_hasher import PasswordHasher
 from app.core.interfaces.user_gateways import UserGateway, UserReader
+from app.core.queries.company.get_company_by_id import GetCompanyById
+from app.core.queries.company.get_many_companies import GetManyCompanies
 from app.core.queries.user.get_me import GetMe
 from app.core.queries.user.get_user import GetUserById
 from app.core.queries.user.get_users import GetUsers
@@ -109,7 +119,16 @@ def interactor_provider() -> Provider:
     provider.provide(GetUserById, scope=Scope.REQUEST)
     provider.provide(GetUsers, scope=Scope.REQUEST)
 
-    provider.provide(CreateCompany, scope=Scope.REQUEST)
+    provider.provide_all(
+        CreateCompany,
+        GetCompanyById,
+        GetManyCompanies,
+        DeleteCompany,
+        EditCompanyDescription,
+        EditCompanyName,
+        EditCompanyVisibility,
+        scope=Scope.REQUEST,
+    )
 
     return provider
 
