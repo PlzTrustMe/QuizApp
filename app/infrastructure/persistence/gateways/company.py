@@ -99,7 +99,7 @@ class SQLAlchemyCompanyReader(CompanyReader):
 
         row = result.mappings().one_or_none()
 
-        return self._load_company(row)
+        return self._load_company(row) if row else None
 
     async def many(
         self, filters: CompanyFilters, pagination: Pagination
