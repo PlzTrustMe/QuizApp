@@ -1,5 +1,5 @@
 from app.core.interfaces.user_gateways import UserDetail
-from app.core.queries.get_me import GetMe
+from app.core.queries.user.get_me import GetMe
 from tests.mocks.id_provider import FakeIdProvider
 
 

@@ -43,9 +43,9 @@ from app.core.entities.errors import (
     WeakPasswordError,
 )
 from app.core.interfaces.user_gateways import UserDetail, UserFilters
-from app.core.queries.get_me import GetMe
-from app.core.queries.get_user import GetUserById, GetUserByIdInputData
-from app.core.queries.get_users import (
+from app.core.queries.user.get_me import GetMe
+from app.core.queries.user.get_user import GetUserById, GetUserByIdInputData
+from app.core.queries.user.get_users import (
     GetUsers,
     GetUsersInputData,
     GetUsersOutputData,

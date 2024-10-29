@@ -22,14 +22,15 @@ from app.core.common.access_service import AccessService
 from app.core.common.commiter import Commiter
 from app.core.interfaces.company_gateways import (
     CompanyGateway,
+    CompanyReader,
     CompanyUserGateway,
 )
 from app.core.interfaces.id_provider import IdProvider
 from app.core.interfaces.password_hasher import PasswordHasher
 from app.core.interfaces.user_gateways import UserGateway, UserReader
-from app.core.queries.get_me import GetMe
-from app.core.queries.get_user import GetUserById
-from app.core.queries.get_users import GetUsers
+from app.core.queries.user.get_me import GetMe
+from app.core.queries.user.get_user import GetUserById
+from app.core.queries.user.get_users import GetUsers
 from app.infrastructure.auth.access_token_processor import AccessTokenProcessor
 from app.infrastructure.auth.id_provider import TokenIdProvider
 from app.infrastructure.auth.password_hasher import ArgonPasswordHasher
@@ -43,6 +44,7 @@ from app.infrastructure.persistence.config import DBConfig
 from app.infrastructure.persistence.gateways.company import (
     CompanyMapper,
     CompanyUserMapper,
+    SQLAlchemyCompanyReader,
 )
 from app.infrastructure.persistence.gateways.user import (
     SQLAlchemyUserReader,
@@ -68,6 +70,10 @@ def gateway_provider() -> Provider:
     provider.provide(
         CompanyMapper, scope=Scope.REQUEST, provides=CompanyGateway
     )
+    provider.provide(
+        SQLAlchemyCompanyReader, scope=Scope.REQUEST, provides=CompanyReader
+    )
+
     provider.provide(
         CompanyUserMapper, scope=Scope.REQUEST, provides=CompanyUserGateway
     )
