@@ -4,11 +4,10 @@ from app.core.commands.company.errors import (
     CompanyNotFoundError,
     CompanyUserNotFoundError,
 )
-from app.core.commands.company.remove_user_from_company import (
-    RemoveUserFromCompany,
-    RemoveUserFromCompanyInputData,
+from app.core.commands.company.leave_from_company import (
+    LeaveFromCompany,
+    LeaveFromCompanyInputData,
 )
-from app.core.common.access_service import AccessService
 from tests.mocks.commiter import FakeCommiter
 from tests.mocks.company_gateways import (
     FakeCompanyMapper,
@@ -24,19 +23,16 @@ from tests.mocks.company_gateways import (
         (2, 2, CompanyNotFoundError),
     ],
 )
-async def test_remove_user_from_company(
+async def test_leave_from_company(
     company_gateway: FakeCompanyMapper,
     company_user_gateway: FakeCompanyUserMapper,
-    access_service: AccessService,
     commiter: FakeCommiter,
     company_id: int,
     user_id: int,
     exc_class,
 ) -> None:
-    command = RemoveUserFromCompany(
-        company_gateway, company_user_gateway, access_service, commiter
-    )
-    input_data = RemoveUserFromCompanyInputData(company_id, user_id)
+    command = LeaveFromCompany(company_gateway, company_user_gateway, commiter)
+    input_data = LeaveFromCompanyInputData(company_id, user_id)
 
     coro = command(input_data)
 
