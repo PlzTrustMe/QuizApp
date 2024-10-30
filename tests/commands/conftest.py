@@ -8,6 +8,10 @@ from tests.mocks.company_gateways import (
     FakeCompanyUserMapper,
 )
 from tests.mocks.id_provider import FakeIdProvider
+from tests.mocks.invitation_gateways import (
+    FakeInvitationMapper,
+    FakeUserRequestMapper,
+)
 from tests.mocks.user_gateways import FakeUserMapper
 
 
@@ -22,8 +26,10 @@ def commiter() -> FakeCommiter:
 
 
 @pytest.fixture
-def access_service(id_provider: FakeIdProvider) -> AccessService:
-    return AccessService(id_provider)
+def access_service(
+    id_provider: FakeIdProvider, company_user_gateway: FakeCompanyUserMapper
+) -> AccessService:
+    return AccessService(id_provider, company_user_gateway)
 
 
 @pytest.fixture
@@ -34,3 +40,13 @@ def company_gateway() -> FakeCompanyMapper:
 @pytest.fixture
 def company_user_gateway() -> FakeCompanyUserMapper:
     return FakeCompanyUserMapper()
+
+
+@pytest.fixture
+def invitation_gateway() -> FakeInvitationMapper:
+    return FakeInvitationMapper()
+
+
+@pytest.fixture
+def user_request_gateway() -> FakeUserRequestMapper:
+    return FakeUserRequestMapper()

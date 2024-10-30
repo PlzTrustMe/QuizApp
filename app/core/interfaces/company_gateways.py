@@ -9,6 +9,7 @@ from app.core.entities.company import (
     CompanyUser,
     Visibility,
 )
+from app.core.entities.user import UserId
 from app.core.entities.value_objects import CompanyName
 
 
@@ -33,6 +34,10 @@ class CompanyGateway(Protocol):
 class CompanyUserGateway(Protocol):
     @abstractmethod
     async def add(self, company_user: CompanyUser) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def is_exist(self, company_id: CompanyId, user_id: UserId) -> bool:
         raise NotImplementedError
 
 

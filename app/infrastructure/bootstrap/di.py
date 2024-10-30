@@ -207,10 +207,10 @@ class HTTPProvider(Provider):
 
     @provide(scope=Scope.REQUEST)
     def get_idp(
-        self, token_auth: TokenAuth, user_reader: UserReader
+        self, token_auth: TokenAuth, user_gateway: UserGateway
     ) -> IdProvider:
         token = token_auth.get_access_token()
-        id_provider = TokenIdProvider(token, user_reader)
+        id_provider = TokenIdProvider(token, user_gateway)
 
         return id_provider
 
