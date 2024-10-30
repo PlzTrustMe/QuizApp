@@ -1,7 +1,7 @@
 from app.core.commands.invitation.errors import CompanyUserAlreadyExistError
 from app.core.commands.user.errors import AccessDeniedError
 from app.core.entities.company import Company, CompanyId
-from app.core.entities.invitation import Invitation
+from app.core.entities.invitation import Invitation, UserRequest
 from app.core.entities.user import User, UserId
 from app.core.interfaces.company_gateways import CompanyUserGateway
 from app.core.interfaces.id_provider import IdProvider
@@ -69,3 +69,10 @@ class AccessService:
         self, company: Company, user_id: UserId
     ):
         await self._is_owner(company) or await self._is_identity(user_id)
+
+    async def ensure_can_accept_user_request(
+        self, user_request: UserRequest, company: Company
+    ):
+        await self._is_owner(company) and await self._is_not_company_member(
+            user_request.company_id, user_request.user_id
+        )
