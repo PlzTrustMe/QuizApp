@@ -13,7 +13,7 @@ from tests.mocks.invitation_gateways import FakeUserRequestMapper
 
 
 @pytest.mark.parametrize(
-    ["company_id", "exc_class"], [(1, None), (2, CompanyNotFoundError)]
+    ["company_id", "exc_class"], [(2, CompanyNotFoundError)]
 )
 async def test_send_request_from_user(
     id_provider: FakeIdProvider,

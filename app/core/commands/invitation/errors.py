@@ -38,6 +38,15 @@ class UserRequestAlreadyExistError(ApplicationError):
         )
 
 
+@dataclass(eq=False)
+class UserRequestNotFoundError(ApplicationError):
+    user_request_id: int
+
+    @property
+    def message(self) -> str:
+        return f"User request with id {self.user_request_id} not found"
+
+
 @dataclass
 class CompanyUserAlreadyExistError(ApplicationError):
     company_id: int

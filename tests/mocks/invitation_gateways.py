@@ -47,7 +47,7 @@ class FakeUserRequestMapper(UserRequestGateway):
         self.user_request = UserRequest(
             user_request_id=UserRequestId(1),
             company_id=CompanyId(1),
-            user_id=UserId(2),
+            user_id=UserId(1),
         )
 
         self.saved = False
@@ -64,3 +64,10 @@ class FakeUserRequestMapper(UserRequestGateway):
             and self.user_request.user_id == user_id
             and self.user_request.status == RequestStatus.NEW
         )
+
+    async def by_id(
+        self, user_request_id: UserRequestId
+    ) -> UserRequest | None:
+        if self.user_request.user_request_id == user_request_id:
+            return self.user_request
+        return None

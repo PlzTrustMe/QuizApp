@@ -53,8 +53,6 @@ class AccessService:
     ):
         await self._is_owner(company) or await self._is_identity(
             invitation.user_id
-        ) and await self._is_not_company_member(
-            company.company_id, invitation.user_id
         )
 
     async def ensure_can_accept_invitation(self, invitation: Invitation):
@@ -66,3 +64,8 @@ class AccessService:
 
     async def ensure_can_send_request(self, company: Company, user: User):
         await self._is_not_company_member(company.company_id, user.user_id)
+
+    async def ensure_can_reject_user_request(
+        self, company: Company, user_id: UserId
+    ):
+        await self._is_owner(company) or await self._is_identity(user_id)
