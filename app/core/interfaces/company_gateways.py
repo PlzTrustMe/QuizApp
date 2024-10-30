@@ -7,6 +7,7 @@ from app.core.entities.company import (
     Company,
     CompanyId,
     CompanyUser,
+    CompanyUserId,
     Visibility,
 )
 from app.core.entities.user import UserId
@@ -38,6 +39,14 @@ class CompanyUserGateway(Protocol):
 
     @abstractmethod
     async def is_exist(self, company_id: CompanyId, user_id: UserId) -> bool:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def by_identity(self, user_id: UserId) -> CompanyUser | None:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def delete(self, company_user_id: CompanyUserId) -> None:
         raise NotImplementedError
 
 

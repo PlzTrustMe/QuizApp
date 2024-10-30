@@ -76,3 +76,6 @@ class AccessService:
         await self._is_owner(company) and await self._is_not_company_member(
             user_request.company_id, user_request.user_id
         )
+
+    async def ensure_can_delete_from_company(self, company: Company):
+        await self._is_owner(company)

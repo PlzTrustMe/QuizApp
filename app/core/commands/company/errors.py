@@ -19,3 +19,10 @@ class CompanyNotFoundError(ApplicationError):
     @property
     def message(self) -> str:
         return f"Company with id {self.company_id} not found"
+
+
+@dataclass(eq=False)
+class CompanyUserNotFoundError(ApplicationError):
+    @property
+    def message(self) -> str:
+        return "Company user not found"
