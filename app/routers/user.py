@@ -6,14 +6,17 @@ from fastapi import APIRouter, Depends, Query, Response, status
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBearer
 
-from app.core.commands.delete_user import DeleteUser, DeleteUserInputData
-from app.core.commands.edit_full_name import (
+from app.core.commands.user.delete_user import DeleteUser, DeleteUserInputData
+from app.core.commands.user.edit_full_name import (
     EditFullName,
     EditFullNameInputData,
     EditFullNameOutputData,
 )
-from app.core.commands.edit_password import EditPassword, EditPasswordInputData
-from app.core.commands.errors import (
+from app.core.commands.user.edit_password import (
+    EditPassword,
+    EditPasswordInputData,
+)
+from app.core.commands.user.errors import (
     AccessDeniedError,
     AccessTokenIsExpiredError,
     PasswordMismatchError,
@@ -21,12 +24,12 @@ from app.core.commands.errors import (
     UserEmailAlreadyExistError,
     UserNotFoundError,
 )
-from app.core.commands.sign_in import SignIn, SignInInputData
-from app.core.commands.sign_in_by_oauth import (
+from app.core.commands.user.sign_in import SignIn, SignInInputData
+from app.core.commands.user.sign_in_by_oauth import (
     SignInByOauth,
     SignInByOauthInputData,
 )
-from app.core.commands.sign_up import (
+from app.core.commands.user.sign_up import (
     SignUp,
     SignUpInputData,
     SignUpOutputData,
@@ -40,9 +43,9 @@ from app.core.entities.errors import (
     WeakPasswordError,
 )
 from app.core.interfaces.user_gateways import UserDetail, UserFilters
-from app.core.queries.get_me import GetMe
-from app.core.queries.get_user import GetUserById, GetUserByIdInputData
-from app.core.queries.get_users import (
+from app.core.queries.user.get_me import GetMe
+from app.core.queries.user.get_user import GetUserById, GetUserByIdInputData
+from app.core.queries.user.get_users import (
     GetUsers,
     GetUsersInputData,
     GetUsersOutputData,
@@ -53,7 +56,7 @@ from app.schemas.user import (
     SignInSchema,
     SignUpSchema,
     UserUpdateFullNameSchema,
-    UserUpdatePassword,
+    UserUpdatePasswordSchema,
 )
 
 user_router = APIRouter(
@@ -212,7 +215,9 @@ async def edit_full_name(
     },
 )
 async def edit_password(
-    user_id: int, body: UserUpdatePassword, action: FromDishka[EditPassword]
+    user_id: int,
+    body: UserUpdatePasswordSchema,
+    action: FromDishka[EditPassword],
 ) -> OkResponse:
     await action(
         EditPasswordInputData(

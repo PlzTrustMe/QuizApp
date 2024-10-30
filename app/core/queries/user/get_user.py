@@ -1,7 +1,7 @@
 import logging
 from dataclasses import dataclass
 
-from app.core.commands.errors import UserNotFoundError
+from app.core.commands.user.errors import UserNotFoundError
 from app.core.entities.user import UserId
 from app.core.interfaces.user_gateways import UserDetail, UserReader
 

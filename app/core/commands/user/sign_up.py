@@ -1,7 +1,7 @@
 import logging
 from dataclasses import dataclass
 
-from app.core.commands.errors import UserEmailAlreadyExistError
+from app.core.commands.user.errors import UserEmailAlreadyExistError
 from app.core.common.commiter import Commiter
 from app.core.entities.user import User
 from app.core.entities.value_objects import (

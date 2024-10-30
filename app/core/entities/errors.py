@@ -4,6 +4,24 @@ from app.core.common.base_error import ApplicationError
 
 
 @dataclass(eq=False)
+class CompanyNameTooLongError(ApplicationError):
+    name: str
+
+    @property
+    def message(self):
+        return f"The company name is to long - {self.name[:15]}"
+
+
+@dataclass(eq=False)
+class CompanyDescriptionTooLongError(ApplicationError):
+    description: str
+
+    @property
+    def message(self):
+        return f"The company description is to long - {self.description[:128]}"
+
+
+@dataclass(eq=False)
 class FirstNameTooLongError(ApplicationError):
     first_name: str
 

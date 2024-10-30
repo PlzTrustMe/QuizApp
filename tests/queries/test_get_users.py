@@ -1,6 +1,6 @@
 from app.core.common.pagination import Pagination
 from app.core.interfaces.user_gateways import UserFilters
-from app.core.queries.get_users import (
+from app.core.queries.user.get_users import (
     GetUsers,
     GetUsersInputData,
     GetUsersOutputData,

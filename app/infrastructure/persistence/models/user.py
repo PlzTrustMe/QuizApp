@@ -1,5 +1,5 @@
 import sqlalchemy as sa
-from sqlalchemy.orm import composite
+from sqlalchemy.orm import composite, relationship
 
 from app.core.entities.user import User
 from app.core.entities.value_objects import FullName, UserEmail
@@ -44,6 +44,14 @@ def map_users_table() -> None:
         User,
         users_table,
         properties={
+            "company": relationship(
+                "Company", back_populates="user", cascade="all, delete-orphan"
+            ),
+            "company_user": relationship(
+                "CompanyUser",
+                back_populates="user",
+                cascade="all, delete-orphan",
+            ),
             "full_name": composite(
                 FullName, users_table.c.first_name, users_table.c.last_name
             ),

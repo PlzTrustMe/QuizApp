@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 
-from app.core.commands.errors import (
+from app.core.commands.user.errors import (
     UserNotFoundByEmailError,
 )
 from app.core.entities.value_objects import (

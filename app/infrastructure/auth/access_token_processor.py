@@ -1,10 +1,10 @@
 from datetime import UTC, datetime
 
-from app.core.commands.errors import (
+from app.core.commands.user.errors import (
     AccessTokenIsExpiredError,
     UnauthorizedError,
 )
-from app.core.commands.sign_in import AccessTokenData
+from app.core.commands.user.sign_in import AccessTokenData
 from app.infrastructure.jwt.exception import JWTDecodeError, JWTExpiredError
 from app.infrastructure.jwt.jwt_processor import JWTProcessor, JWTToken
 

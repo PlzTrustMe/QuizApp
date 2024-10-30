@@ -1,5 +1,5 @@
-from app.core.commands.errors import UnauthorizedError, UserNotFoundError
-from app.core.commands.sign_in import AccessTokenData
+from app.core.commands.user.errors import UnauthorizedError, UserNotFoundError
+from app.core.commands.user.sign_in import AccessTokenData
 from app.core.entities.value_objects import UserEmail
 from app.core.interfaces.id_provider import IdProvider
 from app.core.interfaces.user_gateways import (

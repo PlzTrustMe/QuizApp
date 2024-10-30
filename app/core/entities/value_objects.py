@@ -5,12 +5,48 @@ from datetime import UTC, datetime
 from email_validator import EmailNotValidError, validate_email
 
 from app.core.entities.errors import (
+    CompanyDescriptionTooLongError,
+    CompanyNameTooLongError,
     EmptyError,
     FirstNameTooLongError,
     InvalidUserEmailError,
     LastNameTooLongError,
     WeakPasswordError,
 )
+
+
+@dataclass(slots=True, frozen=True, eq=True, unsafe_hash=True)
+class CompanyName:
+    value: str
+
+    def __post_init__(self) -> None:
+        max_length = 15
+
+        if not self.value:
+            raise EmptyError()
+
+        if len(self.value) > max_length:
+            raise CompanyNameTooLongError(self.value)
+
+    def to_raw(self):
+        return self.value
+
+    def __str__(self) -> str:
+        return self.value
+
+
+@dataclass(slots=True, frozen=True, eq=True, unsafe_hash=True)
+class CompanyDescription:
+    value: str
+
+    def __post_init__(self):
+        max_length = 128
+
+        if len(self.value) > max_length:
+            raise CompanyDescriptionTooLongError(self.value)
+
+    def to_raw(self):
+        return self.value
 
 
 @dataclass(slots=True, frozen=True, eq=True, unsafe_hash=True)

@@ -1,7 +1,7 @@
 import pytest
 
-from app.core.commands.delete_user import DeleteUser, DeleteUserInputData
-from app.core.commands.errors import UserNotFoundError
+from app.core.commands.user.delete_user import DeleteUser, DeleteUserInputData
+from app.core.commands.user.errors import UserNotFoundError
 from app.core.common.access_service import AccessService
 from tests.mocks.commiter import FakeCommiter
 from tests.mocks.user_gateways import FakeUserMapper

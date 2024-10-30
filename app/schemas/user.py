@@ -30,10 +30,10 @@ class UserUpdateFullNameSchema(BaseModel):
     last_name: str
 
 
-class UserUpdatePassword(BaseModel):
+class UserUpdatePasswordSchema(BaseModel):
     old_password: str
     new_password: str
 
 
-class UserUpdateEmail(BaseModel):
+class UserUpdateEmailSchema(BaseModel):
     new_email: str

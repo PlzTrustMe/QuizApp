@@ -4,7 +4,7 @@ from sqlalchemy import RowMapping, Select, delete, exists, func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.commands.errors import UnexpectedError
+from app.core.commands.user.errors import UnexpectedError
 from app.core.common.pagination import Pagination, SortOrder
 from app.core.entities.user import User, UserId
 from app.core.entities.value_objects import UserEmail

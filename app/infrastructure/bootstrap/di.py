@@ -11,20 +11,36 @@ from dishka import (
 )
 from fastapi import Request
 
-from app.core.commands.delete_user import DeleteUser
-from app.core.commands.edit_full_name import EditFullName
-from app.core.commands.edit_password import EditPassword
-from app.core.commands.sign_in import AccessTokenData, SignIn
-from app.core.commands.sign_in_by_oauth import SignInByOauth
-from app.core.commands.sign_up import SignUp
+from app.core.commands.company.create_company import CreateCompany
+from app.core.commands.company.delete_company import DeleteCompany
+from app.core.commands.company.edit_company_description import (
+    EditCompanyDescription,
+)
+from app.core.commands.company.edit_company_name import EditCompanyName
+from app.core.commands.company.edit_company_visibility import (
+    EditCompanyVisibility,
+)
+from app.core.commands.user.delete_user import DeleteUser
+from app.core.commands.user.edit_full_name import EditFullName
+from app.core.commands.user.edit_password import EditPassword
+from app.core.commands.user.sign_in import AccessTokenData, SignIn
+from app.core.commands.user.sign_in_by_oauth import SignInByOauth
+from app.core.commands.user.sign_up import SignUp
 from app.core.common.access_service import AccessService
 from app.core.common.commiter import Commiter
+from app.core.interfaces.company_gateways import (
+    CompanyGateway,
+    CompanyReader,
+    CompanyUserGateway,
+)
 from app.core.interfaces.id_provider import IdProvider
 from app.core.interfaces.password_hasher import PasswordHasher
 from app.core.interfaces.user_gateways import UserGateway, UserReader
-from app.core.queries.get_me import GetMe
-from app.core.queries.get_user import GetUserById
-from app.core.queries.get_users import GetUsers
+from app.core.queries.company.get_company_by_id import GetCompanyById
+from app.core.queries.company.get_many_companies import GetManyCompanies
+from app.core.queries.user.get_me import GetMe
+from app.core.queries.user.get_user import GetUserById
+from app.core.queries.user.get_users import GetUsers
 from app.infrastructure.auth.access_token_processor import AccessTokenProcessor
 from app.infrastructure.auth.id_provider import TokenIdProvider
 from app.infrastructure.auth.password_hasher import ArgonPasswordHasher
@@ -35,6 +51,11 @@ from app.infrastructure.jwt.config import Auth0Config, JWTConfig
 from app.infrastructure.jwt.jwt_processor import JWTProcessor, PyJWTProcessor
 from app.infrastructure.persistence.commiter import SACommiter
 from app.infrastructure.persistence.config import DBConfig
+from app.infrastructure.persistence.gateways.company import (
+    CompanyMapper,
+    CompanyUserMapper,
+    SQLAlchemyCompanyReader,
+)
 from app.infrastructure.persistence.gateways.user import (
     SQLAlchemyUserReader,
     UserMapper,
@@ -54,6 +75,17 @@ def gateway_provider() -> Provider:
     provider.provide(UserMapper, scope=Scope.REQUEST, provides=UserGateway)
     provider.provide(
         SQLAlchemyUserReader, scope=Scope.REQUEST, provides=UserReader
+    )
+
+    provider.provide(
+        CompanyMapper, scope=Scope.REQUEST, provides=CompanyGateway
+    )
+    provider.provide(
+        SQLAlchemyCompanyReader, scope=Scope.REQUEST, provides=CompanyReader
+    )
+
+    provider.provide(
+        CompanyUserMapper, scope=Scope.REQUEST, provides=CompanyUserGateway
     )
 
     provider.provide(
@@ -86,6 +118,17 @@ def interactor_provider() -> Provider:
     provider.provide(DeleteUser, scope=Scope.REQUEST)
     provider.provide(GetUserById, scope=Scope.REQUEST)
     provider.provide(GetUsers, scope=Scope.REQUEST)
+
+    provider.provide_all(
+        CreateCompany,
+        GetCompanyById,
+        GetManyCompanies,
+        DeleteCompany,
+        EditCompanyDescription,
+        EditCompanyName,
+        EditCompanyVisibility,
+        scope=Scope.REQUEST,
+    )
 
     return provider
 

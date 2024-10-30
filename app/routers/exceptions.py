@@ -5,7 +5,11 @@ from typing import Awaitable, Callable
 from fastapi import FastAPI, status
 from starlette.requests import Request
 
-from app.core.commands.errors import (
+from app.core.commands.company.errors import (
+    CompanyNotFoundError,
+    CompanyWithNameAlreadyExistError,
+)
+from app.core.commands.user.errors import (
     AccessDeniedError,
     AccessTokenIsExpiredError,
     PasswordMismatchError,
@@ -15,6 +19,8 @@ from app.core.commands.errors import (
 )
 from app.core.common.base_error import ApplicationError
 from app.core.entities.errors import (
+    CompanyDescriptionTooLongError,
+    CompanyNameTooLongError,
     EmptyError,
     FirstNameTooLongError,
     InvalidUserEmailError,
@@ -33,6 +39,13 @@ def setup_exception_handlers(app: FastAPI) -> None:
         FirstNameTooLongError, error_handler(status.HTTP_400_BAD_REQUEST)
     )
     app.add_exception_handler(
+        CompanyNameTooLongError, error_handler(status.HTTP_400_BAD_REQUEST)
+    )
+    app.add_exception_handler(
+        CompanyDescriptionTooLongError,
+        error_handler(status.HTTP_400_BAD_REQUEST),
+    )
+    app.add_exception_handler(
         LastNameTooLongError, error_handler(status.HTTP_400_BAD_REQUEST)
     )
     app.add_exception_handler(
@@ -49,7 +62,14 @@ def setup_exception_handlers(app: FastAPI) -> None:
         UserNotFoundError, error_handler(status.HTTP_404_NOT_FOUND)
     )
     app.add_exception_handler(
+        CompanyNotFoundError, error_handler(status.HTTP_404_NOT_FOUND)
+    )
+    app.add_exception_handler(
         UserEmailAlreadyExistError, error_handler(status.HTTP_409_CONFLICT)
+    )
+    app.add_exception_handler(
+        CompanyWithNameAlreadyExistError,
+        error_handler(status.HTTP_409_CONFLICT),
     )
     app.add_exception_handler(
         PasswordMismatchError, error_handler(status.HTTP_401_UNAUTHORIZED)

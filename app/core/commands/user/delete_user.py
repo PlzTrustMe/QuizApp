@@ -1,7 +1,7 @@
 import logging
 from dataclasses import dataclass
 
-from app.core.commands.errors import UserNotFoundError
+from app.core.commands.user.errors import UserNotFoundError
 from app.core.common.access_service import AccessService
 from app.core.common.commiter import Commiter
 from app.core.entities.user import UserId

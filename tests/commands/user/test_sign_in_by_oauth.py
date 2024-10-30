@@ -1,4 +1,4 @@
-from app.core.commands.sign_in_by_oauth import (
+from app.core.commands.user.sign_in_by_oauth import (
     SignInByOauth,
     SignInByOauthInputData,
 )
