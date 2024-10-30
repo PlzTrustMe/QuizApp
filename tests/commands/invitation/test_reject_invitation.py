@@ -1,7 +1,7 @@
 import pytest
 
 from app.core.commands.invitation.errors import InvitationNotFoundError
-from app.core.commands.invitation.reject_invitation_by_owner import (
+from app.core.commands.invitation.reject_invitation import (
     RejectInvitation,
     RejectInvitationInputData,
 )

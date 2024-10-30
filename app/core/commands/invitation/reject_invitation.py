@@ -1,6 +1,7 @@
 import logging
 from dataclasses import dataclass
 
+from app.core.commands.company.errors import CompanyNotFoundError
 from app.core.commands.invitation.errors import InvitationNotFoundError
 from app.core.common.access_service import AccessService
 from app.core.common.commiter import Commiter
@@ -28,6 +29,8 @@ class RejectInvitation:
         if not invitation:
             raise InvitationNotFoundError(invitation_id)
         company = await self.company_gateway.by_id(invitation.company_id)
+        if not company:
+            raise CompanyNotFoundError(invitation.company_id)
 
         await self.access_service.ensure_can_reject_invitation(
             company, invitation
