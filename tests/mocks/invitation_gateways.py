@@ -36,6 +36,11 @@ class FakeInvitationMapper(InvitationGateway):
             and self.invitation.status == RequestStatus.NEW
         )
 
+    async def by_id(self, invitation_id: InvitationId) -> Invitation | None:
+        if self.invitation.invitation_id == invitation_id:
+            return self.invitation
+        return None
+
 
 class FakeUserRequestMapper(UserRequestGateway):
     def __init__(self):

@@ -17,6 +17,15 @@ class InvitationAlreadyExistError(ApplicationError):
 
 
 @dataclass(eq=False)
+class InvitationNotFoundError(ApplicationError):
+    invitation_id: int
+
+    @property
+    def message(self) -> str:
+        return f"Invitation with id {self.invitation_id} not found"
+
+
+@dataclass(eq=False)
 class UserRequestAlreadyExistError(ApplicationError):
     company_id: int
     user_id: int

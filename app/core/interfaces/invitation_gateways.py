@@ -2,7 +2,7 @@ from abc import abstractmethod
 from asyncio import Protocol
 
 from app.core.entities.company import CompanyId
-from app.core.entities.invitation import Invitation, UserRequest
+from app.core.entities.invitation import Invitation, InvitationId, UserRequest
 from app.core.entities.user import UserId
 
 
@@ -13,6 +13,10 @@ class InvitationGateway(Protocol):
 
     @abstractmethod
     async def add(self, invitation: Invitation) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def by_id(self, invitation_id: InvitationId) -> Invitation | None:
         raise NotImplementedError
 
 
