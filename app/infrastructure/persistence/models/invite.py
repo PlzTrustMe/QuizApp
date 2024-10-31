@@ -96,7 +96,7 @@ def map_user_requests_table() -> None:
         UserRequest,
         user_requests_table,
         properties={
-            "user": relationship("User", back_populates="invitation"),
-            "company": relationship("Company", back_populates="invitation"),
+            "user": relationship("User", back_populates="user_request"),
+            "company": relationship("Company", back_populates="user_request"),
         },
     )
