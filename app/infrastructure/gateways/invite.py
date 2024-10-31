@@ -179,11 +179,13 @@ class SQLAlchemyUserRequestReader(UserRequestReader):
         self, query: Select, filters: UserRequestFilters
     ) -> Select:
         if filters.user_id:
-            query = query.where(invitations_table.c.user_id == filters.user_id)
+            query = query.where(
+                user_requests_table.c.user_id == filters.user_id
+            )
 
         if filters.company_id:
             query = query.where(
-                invitations_table.c.company_id == filters.company_id
+                user_requests_table.c.company_id == filters.company_id
             )
 
         return query
