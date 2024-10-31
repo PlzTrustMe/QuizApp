@@ -44,10 +44,19 @@ from app.core.entities.errors import (
     CompanyNameTooLongError,
     EmptyError,
 )
-from app.core.interfaces.company_gateways import CompanyDetail, CompanyFilters
+from app.core.interfaces.company_gateways import (
+    CompanyDetail,
+    CompanyFilters,
+    CompanyUserFilters,
+)
 from app.core.queries.company.get_company_by_id import (
     GetCompanyById,
     GetCompanyByIdInputData,
+)
+from app.core.queries.company.get_company_users import (
+    GetCompanyUsers,
+    GetCompanyUsersInputData,
+    GetCompanyUsersOutputData,
 )
 from app.core.queries.company.get_many_companies import (
     GetManyCompanies,
@@ -126,6 +135,24 @@ async def get_many_companies(
     response = await action(
         GetManyCompaniesInputData(
             filters=CompanyFilters(visibility=visibility),
+            pagination=Pagination(offset, limit, order),
+        )
+    )
+
+    return OkResponse(result=response)
+
+
+@company_router.get("/users/{company_id}")
+async def get_company_users(
+    action: FromDishka[GetCompanyUsers],
+    company_id: int,
+    offset: Annotated[int, Query(ge=0)] = 0,
+    limit: Annotated[int, Query(ge=1, le=1000)] = 1000,
+    order: SortOrder = SortOrder.ASC,
+) -> OkResponse[GetCompanyUsersOutputData]:
+    response = await action(
+        GetCompanyUsersInputData(
+            filters=CompanyUserFilters(company_id=company_id),
             pagination=Pagination(offset, limit, order),
         )
     )

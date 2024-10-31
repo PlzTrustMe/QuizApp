@@ -1,6 +1,8 @@
+from typing import Annotated
+
 from dishka import FromDishka
 from dishka.integrations.fastapi import DishkaRoute
-from fastapi import APIRouter, status
+from fastapi import APIRouter, Query, status
 
 from app.core.commands.invitation.accept_invitation import (
     AcceptInvitation,
@@ -26,7 +28,20 @@ from app.core.commands.invitation.send_request_from_user import (
     SendRequestFromUser,
     SendRequestFromUserInputData,
 )
+from app.core.common.pagination import Pagination, SortOrder
 from app.core.entities.invitation import InvitationId, UserRequestId
+from app.core.queries.invitation.get_invitations import (
+    GetInvitationByOwner,
+    GetInvitationByUser,
+    GetInvitationOutputData,
+    GetInvitations,
+)
+from app.core.queries.invitation.get_user_requests import (
+    GetUserRequests,
+    GetUserRequestsByOwner,
+    GetUserRequestsByUser,
+    GetUserRequestsOutputData,
+)
 from app.routers.responses.base import OkResponse
 from app.schemas.invite import SendInviteToUser, SendReqeustToCompany
 
@@ -36,6 +51,66 @@ invite_router = APIRouter(
     responses={status.HTTP_404_NOT_FOUND: {"description": "Not Found"}},
     route_class=DishkaRoute,
 )
+
+
+@invite_router.get("/received-invitations-by-user")
+async def get_all_received_invitations_by_user(
+    action: FromDishka[GetInvitations],
+    offset: Annotated[int, Query(ge=0)] = 0,
+    limit: Annotated[int, Query(ge=1, le=1000)] = 1000,
+    order: SortOrder = SortOrder.ASC,
+) -> OkResponse[GetInvitationOutputData]:
+    response = await action.by_user(
+        GetInvitationByUser(pagination=Pagination(offset, limit, order))
+    )
+
+    return OkResponse(result=response)
+
+
+@invite_router.get("/received-invitations/{company_id}")
+async def get_all_receiver_invitations_by_owner(
+    action: FromDishka[GetInvitations],
+    company_id: int,
+    offset: Annotated[int, Query(ge=0)] = 0,
+    limit: Annotated[int, Query(ge=1, le=1000)] = 1000,
+    order: SortOrder = SortOrder.ASC,
+) -> OkResponse[GetInvitationOutputData]:
+    response = await action.by_owner(
+        GetInvitationByOwner(
+            pagination=Pagination(offset, limit, order), company_id=company_id
+        )
+    )
+
+    return OkResponse(result=response)
+
+
+@invite_router.get("/user-request")
+async def get_all_user_request_by_user(
+    action: FromDishka[GetUserRequests],
+    offset: Annotated[int, Query(ge=0)] = 0,
+    limit: Annotated[int, Query(ge=1, le=1000)] = 1000,
+    order: SortOrder = SortOrder.ASC,
+) -> OkResponse[GetUserRequestsOutputData]:
+    response = await action.by_user(
+        GetUserRequestsByUser(Pagination(offset, limit, order))
+    )
+
+    return OkResponse(result=response)
+
+
+@invite_router.get("/user-request/{company_id}")
+async def get_all_user_request_by_owner(
+    action: FromDishka[GetUserRequests],
+    company_id: int,
+    offset: Annotated[int, Query(ge=0)] = 0,
+    limit: Annotated[int, Query(ge=1, le=1000)] = 1000,
+    order: SortOrder = SortOrder.ASC,
+) -> OkResponse[GetUserRequestsOutputData]:
+    response = await action.by_owner(
+        GetUserRequestsByOwner(Pagination(offset, limit, order), company_id)
+    )
+
+    return OkResponse(result=response)
 
 
 @invite_router.post("/to-user", status_code=status.HTTP_201_CREATED)

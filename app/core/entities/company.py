@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from enum import Enum, auto
+from enum import Enum
 from typing import NewType
 
 from app.core.entities.user import UserId
@@ -14,10 +14,10 @@ class Visibility(str, Enum):
     VISIBLE = "visible"
 
 
-class CompanyRole(Enum):
-    OWNER = auto()
-    ADMIN = auto()
-    MEMBER = auto()
+class CompanyRole(str, Enum):
+    OWNER = "Owner"
+    ADMIN = "Admin"
+    MEMBER = "Member"
 
 
 @dataclass

@@ -17,7 +17,10 @@ from app.core.interfaces.company_gateways import (
     CompanyFilters,
     CompanyGateway,
     CompanyReader,
+    CompanyUserDetail,
+    CompanyUserFilters,
     CompanyUserGateway,
+    CompanyUserReader,
 )
 from app.infrastructure.persistence.models.company import companies_table
 from app.infrastructure.persistence.models.company_user import (
@@ -172,6 +175,51 @@ class SQLAlchemyCompanyReader(CompanyReader):
 
         if filters:
             query = self._make_filters(query, filters)
+
+        total: int = await self.session.scalar(query)
+
+        return total
+
+
+class SQLAlchemyCompanyUserReader(CompanyUserReader):
+    def __init__(self, session: AsyncSession):
+        self.session = session
+
+    def _load_model(self, row: RowMapping) -> CompanyUserDetail:
+        return CompanyUserDetail(
+            company_user_id=row.company_user_id,
+            user_id=row.user_id,
+            role=row.role,
+        )
+
+    async def many(
+        self, filters: CompanyUserFilters, pagination: Pagination
+    ) -> list[CompanyUserDetail]:
+        query = select(
+            company_users_table.c.company_user_id,
+            company_users_table.c.user_id,
+            company_users_table.c.role,
+        ).where(company_users_table.c.company_id == filters.company_id)
+
+        if pagination.order is SortOrder.ASC:
+            query = query.order_by(company_users_table.c.created_at.asc())
+        else:
+            query = query.order_by(company_users_table.c.created_at.desc())
+
+        if pagination.offset is not None:
+            query = query.offset(pagination.offset)
+        if pagination.limit is not None:
+            query = query.limit(pagination.limit)
+
+        result = await self.session.execute(query)
+
+        return [self._load_model(row) for row in result.mappings()]
+
+    async def total(self, filters: CompanyUserFilters) -> int:
+        query = select(func.count(company_users_table.c.company_user_id))
+        query = query.where(
+            company_users_table.c.company_id == filters.company_id
+        )
 
         total: int = await self.session.scalar(query)
 

@@ -46,6 +46,7 @@ from app.core.interfaces.company_gateways import (
     CompanyGateway,
     CompanyReader,
     CompanyUserGateway,
+    CompanyUserReader,
 )
 from app.core.interfaces.id_provider import IdProvider
 from app.core.interfaces.invitation_gateways import (
@@ -57,7 +58,10 @@ from app.core.interfaces.invitation_gateways import (
 from app.core.interfaces.password_hasher import PasswordHasher
 from app.core.interfaces.user_gateways import UserGateway, UserReader
 from app.core.queries.company.get_company_by_id import GetCompanyById
+from app.core.queries.company.get_company_users import GetCompanyUsers
 from app.core.queries.company.get_many_companies import GetManyCompanies
+from app.core.queries.invitation.get_invitations import GetInvitations
+from app.core.queries.invitation.get_user_requests import GetUserRequests
 from app.core.queries.user.get_me import GetMe
 from app.core.queries.user.get_user import GetUserById
 from app.core.queries.user.get_users import GetUsers
@@ -71,6 +75,7 @@ from app.infrastructure.gateways.company import (
     CompanyMapper,
     CompanyUserMapper,
     SQLAlchemyCompanyReader,
+    SQLAlchemyCompanyUserReader,
 )
 from app.infrastructure.gateways.invite import (
     InvitationMapper,
@@ -123,6 +128,13 @@ def gateway_provider() -> Provider:
     provider.provide(
         UserRequestMapper, scope=Scope.REQUEST, provides=UserRequestGateway
     )
+
+    provider.provide(
+        SQLAlchemyCompanyUserReader,
+        scope=Scope.REQUEST,
+        provides=CompanyUserReader,
+    )
+
     provider.provide(
         SQLAlchemyUserRequestReader,
         scope=Scope.REQUEST,
@@ -180,6 +192,9 @@ def interactor_provider() -> Provider:
         RejectInvitation,
         AcceptUserRequest,
         AcceptInvitation,
+        GetInvitations,
+        GetUserRequests,
+        GetCompanyUsers,
         scope=Scope.REQUEST,
     )
 
