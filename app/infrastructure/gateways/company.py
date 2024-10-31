@@ -192,6 +192,16 @@ class SQLAlchemyCompanyUserReader(CompanyUserReader):
             role=row.role,
         )
 
+    def _make_filters(
+        self, query: Select, filters: CompanyUserFilters
+    ) -> Select:
+        if filters.company_role:
+            query = query.where(
+                company_users_table.c.role == filters.company_role
+            )
+
+        return query
+
     async def many(
         self, filters: CompanyUserFilters, pagination: Pagination
     ) -> list[CompanyUserDetail]:
@@ -200,6 +210,8 @@ class SQLAlchemyCompanyUserReader(CompanyUserReader):
             company_users_table.c.user_id,
             company_users_table.c.role,
         ).where(company_users_table.c.company_id == filters.company_id)
+
+        query = self._make_filters(query, filters)
 
         if pagination.order is SortOrder.ASC:
             query = query.order_by(company_users_table.c.created_at.asc())
@@ -220,6 +232,8 @@ class SQLAlchemyCompanyUserReader(CompanyUserReader):
         query = query.where(
             company_users_table.c.company_id == filters.company_id
         )
+
+        query = self._make_filters(query, filters)
 
         total: int = await self.session.scalar(query)
 
