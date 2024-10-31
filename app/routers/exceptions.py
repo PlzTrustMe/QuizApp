@@ -7,7 +7,15 @@ from starlette.requests import Request
 
 from app.core.commands.company.errors import (
     CompanyNotFoundError,
+    CompanyUserNotFoundError,
     CompanyWithNameAlreadyExistError,
+)
+from app.core.commands.invitation.errors import (
+    CompanyUserAlreadyExistError,
+    InvitationAlreadyExistError,
+    InvitationNotFoundError,
+    UserRequestAlreadyExistError,
+    UserRequestNotFoundError,
 )
 from app.core.commands.user.errors import (
     AccessDeniedError,
@@ -65,11 +73,29 @@ def setup_exception_handlers(app: FastAPI) -> None:
         CompanyNotFoundError, error_handler(status.HTTP_404_NOT_FOUND)
     )
     app.add_exception_handler(
+        InvitationNotFoundError, error_handler(status.HTTP_404_NOT_FOUND)
+    )
+    app.add_exception_handler(
+        UserRequestNotFoundError, error_handler(status.HTTP_404_NOT_FOUND)
+    )
+    app.add_exception_handler(
+        CompanyUserNotFoundError, error_handler(status.HTTP_404_NOT_FOUND)
+    )
+    app.add_exception_handler(
         UserEmailAlreadyExistError, error_handler(status.HTTP_409_CONFLICT)
     )
     app.add_exception_handler(
         CompanyWithNameAlreadyExistError,
         error_handler(status.HTTP_409_CONFLICT),
+    )
+    app.add_exception_handler(
+        InvitationAlreadyExistError, error_handler(status.HTTP_409_CONFLICT)
+    )
+    app.add_exception_handler(
+        UserRequestAlreadyExistError, error_handler(status.HTTP_409_CONFLICT)
+    )
+    app.add_exception_handler(
+        CompanyUserAlreadyExistError, error_handler(status.HTTP_409_CONFLICT)
     )
     app.add_exception_handler(
         PasswordMismatchError, error_handler(status.HTTP_401_UNAUTHORIZED)

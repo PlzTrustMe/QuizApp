@@ -46,7 +46,7 @@ user_requests_table = sa.Table(
     "user_requests",
     mapper_registry.metadata,
     sa.Column(
-        "user_requests_id",
+        "user_request_id",
         sa.Integer,
         primary_key=True,
         unique=True,

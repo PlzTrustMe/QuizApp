@@ -51,14 +51,14 @@ class AccessService:
     async def ensure_can_reject_invitation(
         self, company: Company, invitation: Invitation
     ):
-        await self._is_owner(company) or await self._is_identity(
-            invitation.user_id
-        )
+        try:
+            await self._is_owner(company)
+        except AccessDeniedError:
+            await self._is_identity(invitation.user_id)
 
     async def ensure_can_accept_invitation(self, invitation: Invitation):
-        await self._is_identity(
-            invitation.user_id
-        ) and await self._is_not_company_member(
+        await self._is_identity(invitation.user_id)
+        await self._is_not_company_member(
             invitation.company_id, invitation.user_id
         )
 
@@ -68,12 +68,16 @@ class AccessService:
     async def ensure_can_reject_user_request(
         self, company: Company, user_id: UserId
     ):
-        await self._is_owner(company) or await self._is_identity(user_id)
+        try:
+            await self._is_owner(company)
+        except AccessDeniedError:
+            await self._is_identity(user_id)
 
     async def ensure_can_accept_user_request(
         self, user_request: UserRequest, company: Company
     ):
-        await self._is_owner(company) and await self._is_not_company_member(
+        await self._is_owner(company)
+        await self._is_not_company_member(
             user_request.company_id, user_request.user_id
         )
 

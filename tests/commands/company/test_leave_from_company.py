@@ -13,6 +13,7 @@ from tests.mocks.company_gateways import (
     FakeCompanyMapper,
     FakeCompanyUserMapper,
 )
+from tests.mocks.id_provider import FakeIdProvider
 
 
 @pytest.mark.parametrize(
@@ -24,6 +25,7 @@ from tests.mocks.company_gateways import (
     ],
 )
 async def test_leave_from_company(
+    id_provider: FakeIdProvider,
     company_gateway: FakeCompanyMapper,
     company_user_gateway: FakeCompanyUserMapper,
     commiter: FakeCommiter,
@@ -31,8 +33,12 @@ async def test_leave_from_company(
     user_id: int,
     exc_class,
 ) -> None:
-    command = LeaveFromCompany(company_gateway, company_user_gateway, commiter)
-    input_data = LeaveFromCompanyInputData(company_id, user_id)
+    id_provider.user.user_id = user_id
+
+    command = LeaveFromCompany(
+        id_provider, company_gateway, company_user_gateway, commiter
+    )
+    input_data = LeaveFromCompanyInputData(company_id)
 
     coro = command(input_data)
 

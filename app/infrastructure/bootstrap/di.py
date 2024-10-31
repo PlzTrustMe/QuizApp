@@ -20,6 +20,20 @@ from app.core.commands.company.edit_company_name import EditCompanyName
 from app.core.commands.company.edit_company_visibility import (
     EditCompanyVisibility,
 )
+from app.core.commands.company.leave_from_company import LeaveFromCompany
+from app.core.commands.company.remove_user_from_company import (
+    RemoveUserFromCompany,
+)
+from app.core.commands.invitation.accept_invitation import AcceptInvitation
+from app.core.commands.invitation.accept_user_request import AcceptUserRequest
+from app.core.commands.invitation.reject_invitation import RejectInvitation
+from app.core.commands.invitation.reject_user_request import RejectUserRequest
+from app.core.commands.invitation.send_invitation_to_user import (
+    SendInvitationToUser,
+)
+from app.core.commands.invitation.send_request_from_user import (
+    SendRequestFromUser,
+)
 from app.core.commands.user.delete_user import DeleteUser
 from app.core.commands.user.edit_full_name import EditFullName
 from app.core.commands.user.edit_password import EditPassword
@@ -154,6 +168,18 @@ def interactor_provider() -> Provider:
         EditCompanyDescription,
         EditCompanyName,
         EditCompanyVisibility,
+        LeaveFromCompany,
+        RemoveUserFromCompany,
+        scope=Scope.REQUEST,
+    )
+
+    provider.provide_all(
+        SendInvitationToUser,
+        SendRequestFromUser,
+        RejectUserRequest,
+        RejectInvitation,
+        AcceptUserRequest,
+        AcceptInvitation,
         scope=Scope.REQUEST,
     )
 

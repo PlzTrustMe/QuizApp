@@ -20,6 +20,9 @@ from app.core.interfaces.company_gateways import (
     CompanyUserGateway,
 )
 from app.infrastructure.persistence.models.company import companies_table
+from app.infrastructure.persistence.models.company_user import (
+    company_users_table,
+)
 
 
 class CompanyMapper(CompanyGateway):
@@ -76,8 +79,8 @@ class CompanyUserMapper(CompanyUserGateway):
         query = select(
             exists().where(
                 and_(
-                    companies_table.c.company_id == company_id,
-                    companies_table.c.user_id == user_id,
+                    company_users_table.c.company_id == company_id,
+                    company_users_table.c.user_id == user_id,
                 )
             )
         )
@@ -87,7 +90,9 @@ class CompanyUserMapper(CompanyUserGateway):
         return result.scalar()
 
     async def by_identity(self, user_id: UserId) -> CompanyUser | None:
-        query = select(CompanyUser).where(companies_table.c.user_id == user_id)
+        query = select(CompanyUser).where(
+            company_users_table.c.user_id == user_id
+        )
 
         result = await self.session.execute(query)
 
@@ -95,7 +100,7 @@ class CompanyUserMapper(CompanyUserGateway):
 
     async def delete(self, company_user_id: CompanyUserId) -> None:
         query = delete(CompanyUser).where(
-            companies_table.c.company_user_id == company_user_id
+            company_users_table.c.company_user_id == company_user_id
         )
 
         await self.session.execute(query)
