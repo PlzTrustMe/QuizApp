@@ -8,6 +8,7 @@ from app.core.entities.company import CompanyId
 from app.core.entities.invitation import (
     Invitation,
     InvitationId,
+    RequestStatus,
     UserRequest,
     UserRequestId,
 )
@@ -38,6 +39,7 @@ class InvitationMapper(InvitationGateway):
                 and_(
                     invitations_table.c.company_id == company_id,
                     invitations_table.c.user_id == user_id,
+                    user_requests_table.c.status == RequestStatus.NEW,
                 )
             )
         )
@@ -74,6 +76,7 @@ class UserRequestMapper(UserRequestGateway):
                 and_(
                     user_requests_table.c.company_id == company_id,
                     user_requests_table.c.user_id == user_id,
+                    user_requests_table.c.status == RequestStatus.NEW,
                 )
             )
         )

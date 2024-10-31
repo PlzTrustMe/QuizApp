@@ -83,6 +83,7 @@ class CompanyReader(Protocol):
 @dataclass(frozen=True)
 class CompanyUserFilters:
     company_id: int
+    company_role: CompanyRole | None = None
 
 
 @dataclass(frozen=True)

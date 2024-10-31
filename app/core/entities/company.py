@@ -14,7 +14,7 @@ class Visibility(str, Enum):
     VISIBLE = "visible"
 
 
-class CompanyRole(Enum):
+class CompanyRole(str, Enum):
     OWNER = auto()
     ADMIN = auto()
     MEMBER = auto()
