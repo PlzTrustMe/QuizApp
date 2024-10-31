@@ -1,10 +1,16 @@
-from sqlalchemy import RowMapping, Select, delete, exists, func, select
+from sqlalchemy import RowMapping, Select, and_, delete, exists, func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.commands.user.errors import UnexpectedError
 from app.core.common.pagination import Pagination, SortOrder
-from app.core.entities.company import Company, CompanyId, CompanyUser
+from app.core.entities.company import (
+    Company,
+    CompanyId,
+    CompanyUser,
+    CompanyUserId,
+)
+from app.core.entities.user import UserId
 from app.core.entities.value_objects import CompanyName
 from app.core.interfaces.company_gateways import (
     CompanyDetail,
@@ -65,6 +71,34 @@ class CompanyUserMapper(CompanyUserGateway):
             await self.session.flush()
         except IntegrityError as error:
             raise UnexpectedError from error
+
+    async def is_exist(self, company_id: CompanyId, user_id: UserId) -> bool:
+        query = select(
+            exists().where(
+                and_(
+                    companies_table.c.company_id == company_id,
+                    companies_table.c.user_id == user_id,
+                )
+            )
+        )
+
+        result = await self.session.execute(query)
+
+        return result.scalar()
+
+    async def by_identity(self, user_id: UserId) -> CompanyUser | None:
+        query = select(CompanyUser).where(companies_table.c.user_id == user_id)
+
+        result = await self.session.execute(query)
+
+        return result.scalar_one_or_none()
+
+    async def delete(self, company_user_id: CompanyUserId) -> None:
+        query = delete(CompanyUser).where(
+            companies_table.c.company_user_id == company_user_id
+        )
+
+        await self.session.execute(query)
 
 
 class SQLAlchemyCompanyReader(CompanyReader):

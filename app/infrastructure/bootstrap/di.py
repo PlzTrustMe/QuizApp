@@ -34,6 +34,12 @@ from app.core.interfaces.company_gateways import (
     CompanyUserGateway,
 )
 from app.core.interfaces.id_provider import IdProvider
+from app.core.interfaces.invitation_gateways import (
+    InvitationGateway,
+    InvitationReader,
+    UserRequestGateway,
+    UserRequestReader,
+)
 from app.core.interfaces.password_hasher import PasswordHasher
 from app.core.interfaces.user_gateways import UserGateway, UserReader
 from app.core.queries.company.get_company_by_id import GetCompanyById
@@ -51,6 +57,12 @@ from app.infrastructure.gateways.company import (
     CompanyMapper,
     CompanyUserMapper,
     SQLAlchemyCompanyReader,
+)
+from app.infrastructure.gateways.invite import (
+    InvitationMapper,
+    SQLAlchemyInvitationReader,
+    SQLAlchemyUserRequestReader,
+    UserRequestMapper,
 )
 from app.infrastructure.gateways.user import SQLAlchemyUserReader, UserMapper
 from app.infrastructure.jwt.config import Auth0Config, JWTConfig
@@ -83,6 +95,24 @@ def gateway_provider() -> Provider:
 
     provider.provide(
         CompanyUserMapper, scope=Scope.REQUEST, provides=CompanyUserGateway
+    )
+
+    provider.provide(
+        InvitationMapper, scope=Scope.REQUEST, provides=InvitationGateway
+    )
+    provider.provide(
+        SQLAlchemyInvitationReader,
+        scope=Scope.REQUEST,
+        provides=InvitationReader,
+    )
+
+    provider.provide(
+        UserRequestMapper, scope=Scope.REQUEST, provides=UserRequestGateway
+    )
+    provider.provide(
+        SQLAlchemyUserRequestReader,
+        scope=Scope.REQUEST,
+        provides=UserRequestReader,
     )
 
     provider.provide(
