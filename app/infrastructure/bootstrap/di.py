@@ -47,19 +47,16 @@ from app.infrastructure.auth.password_hasher import ArgonPasswordHasher
 from app.infrastructure.bootstrap.configs import load_all_configs
 from app.infrastructure.cache.config import RedisConfig
 from app.infrastructure.cache.provider import get_redis
-from app.infrastructure.jwt.config import Auth0Config, JWTConfig
-from app.infrastructure.jwt.jwt_processor import JWTProcessor, PyJWTProcessor
-from app.infrastructure.persistence.commiter import SACommiter
-from app.infrastructure.persistence.config import DBConfig
-from app.infrastructure.persistence.gateways.company import (
+from app.infrastructure.gateways.company import (
     CompanyMapper,
     CompanyUserMapper,
     SQLAlchemyCompanyReader,
 )
-from app.infrastructure.persistence.gateways.user import (
-    SQLAlchemyUserReader,
-    UserMapper,
-)
+from app.infrastructure.gateways.user import SQLAlchemyUserReader, UserMapper
+from app.infrastructure.jwt.config import Auth0Config, JWTConfig
+from app.infrastructure.jwt.jwt_processor import JWTProcessor, PyJWTProcessor
+from app.infrastructure.persistence.commiter import SACommiter
+from app.infrastructure.persistence.config import DBConfig
 from app.infrastructure.persistence.provider import (
     get_async_session,
     get_async_sessionmaker,
