@@ -6,6 +6,7 @@ from app.core.common.pagination import Pagination
 from app.core.entities.company import (
     Company,
     CompanyId,
+    CompanyRole,
     CompanyUser,
     CompanyUserId,
     Visibility,
@@ -76,4 +77,28 @@ class CompanyReader(Protocol):
 
     @abstractmethod
     async def total(self, filters: CompanyFilters) -> int:
+        raise NotImplementedError
+
+
+@dataclass(frozen=True)
+class CompanyUserFilters:
+    company_id: int
+
+
+@dataclass(frozen=True)
+class CompanyUserDetail:
+    company_user_id: int
+    user_id: int
+    role: CompanyRole
+
+
+class CompanyUserReader(Protocol):
+    @abstractmethod
+    async def many(
+        self, filters: CompanyUserFilters, pagination: Pagination
+    ) -> list[CompanyUserDetail]:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def total(self, filters: CompanyUserFilters) -> int:
         raise NotImplementedError
