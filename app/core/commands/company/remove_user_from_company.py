@@ -35,7 +35,9 @@ class RemoveUserFromCompany:
         company = await self.company_gateway.by_id(company_id)
         if not company:
             raise CompanyNotFoundError(company_id)
-        company_user = await self.company_user_gateway.by_identity(user_id)
+        company_user = await self.company_user_gateway.by_identity(
+            company_id, user_id
+        )
         if not company_user:
             raise CompanyUserNotFoundError()
 

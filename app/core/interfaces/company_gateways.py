@@ -43,7 +43,9 @@ class CompanyUserGateway(Protocol):
         raise NotImplementedError
 
     @abstractmethod
-    async def by_identity(self, user_id: UserId) -> CompanyUser | None:
+    async def by_identity(
+        self, company_id: CompanyId, user_id: UserId
+    ) -> CompanyUser | None:
         raise NotImplementedError
 
     @abstractmethod

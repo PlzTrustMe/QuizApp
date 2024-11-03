@@ -68,8 +68,13 @@ class FakeCompanyUserMapper(CompanyUserGateway):
             and self.company_user.company_id == company_id
         )
 
-    async def by_identity(self, user_id: UserId) -> CompanyUser | None:
-        if self.company_user.user_id == user_id:
+    async def by_identity(
+        self, company_id: CompanyId, user_id: UserId
+    ) -> CompanyUser | None:
+        if (
+            self.company_user.user_id == user_id
+            and self.company_user.company_id == company_id
+        ):
             return self.company_user
         return None
 
