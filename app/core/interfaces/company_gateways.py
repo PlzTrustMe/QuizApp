@@ -6,9 +6,12 @@ from app.core.common.pagination import Pagination
 from app.core.entities.company import (
     Company,
     CompanyId,
+    CompanyRole,
     CompanyUser,
+    CompanyUserId,
     Visibility,
 )
+from app.core.entities.user import UserId
 from app.core.entities.value_objects import CompanyName
 
 
@@ -33,6 +36,18 @@ class CompanyGateway(Protocol):
 class CompanyUserGateway(Protocol):
     @abstractmethod
     async def add(self, company_user: CompanyUser) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def is_exist(self, company_id: CompanyId, user_id: UserId) -> bool:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def by_identity(self, user_id: UserId) -> CompanyUser | None:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def delete(self, company_user_id: CompanyUserId) -> None:
         raise NotImplementedError
 
 
@@ -62,4 +77,28 @@ class CompanyReader(Protocol):
 
     @abstractmethod
     async def total(self, filters: CompanyFilters) -> int:
+        raise NotImplementedError
+
+
+@dataclass(frozen=True)
+class CompanyUserFilters:
+    company_id: int
+
+
+@dataclass(frozen=True)
+class CompanyUserDetail:
+    company_user_id: int
+    user_id: int
+    role: CompanyRole
+
+
+class CompanyUserReader(Protocol):
+    @abstractmethod
+    async def many(
+        self, filters: CompanyUserFilters, pagination: Pagination
+    ) -> list[CompanyUserDetail]:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def total(self, filters: CompanyUserFilters) -> int:
         raise NotImplementedError

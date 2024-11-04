@@ -20,6 +20,20 @@ from app.core.commands.company.edit_company_name import EditCompanyName
 from app.core.commands.company.edit_company_visibility import (
     EditCompanyVisibility,
 )
+from app.core.commands.company.leave_from_company import LeaveFromCompany
+from app.core.commands.company.remove_user_from_company import (
+    RemoveUserFromCompany,
+)
+from app.core.commands.invitation.accept_invitation import AcceptInvitation
+from app.core.commands.invitation.accept_user_request import AcceptUserRequest
+from app.core.commands.invitation.reject_invitation import RejectInvitation
+from app.core.commands.invitation.reject_user_request import RejectUserRequest
+from app.core.commands.invitation.send_invitation_to_user import (
+    SendInvitationToUser,
+)
+from app.core.commands.invitation.send_request_from_user import (
+    SendRequestFromUser,
+)
 from app.core.commands.user.delete_user import DeleteUser
 from app.core.commands.user.edit_full_name import EditFullName
 from app.core.commands.user.edit_password import EditPassword
@@ -32,12 +46,22 @@ from app.core.interfaces.company_gateways import (
     CompanyGateway,
     CompanyReader,
     CompanyUserGateway,
+    CompanyUserReader,
 )
 from app.core.interfaces.id_provider import IdProvider
+from app.core.interfaces.invitation_gateways import (
+    InvitationGateway,
+    InvitationReader,
+    UserRequestGateway,
+    UserRequestReader,
+)
 from app.core.interfaces.password_hasher import PasswordHasher
 from app.core.interfaces.user_gateways import UserGateway, UserReader
 from app.core.queries.company.get_company_by_id import GetCompanyById
+from app.core.queries.company.get_company_users import GetCompanyUsers
 from app.core.queries.company.get_many_companies import GetManyCompanies
+from app.core.queries.invitation.get_invitations import GetInvitations
+from app.core.queries.invitation.get_user_requests import GetUserRequests
 from app.core.queries.user.get_me import GetMe
 from app.core.queries.user.get_user import GetUserById
 from app.core.queries.user.get_users import GetUsers
@@ -47,19 +71,23 @@ from app.infrastructure.auth.password_hasher import ArgonPasswordHasher
 from app.infrastructure.bootstrap.configs import load_all_configs
 from app.infrastructure.cache.config import RedisConfig
 from app.infrastructure.cache.provider import get_redis
+from app.infrastructure.gateways.company import (
+    CompanyMapper,
+    CompanyUserMapper,
+    SQLAlchemyCompanyReader,
+    SQLAlchemyCompanyUserReader,
+)
+from app.infrastructure.gateways.invite import (
+    InvitationMapper,
+    SQLAlchemyInvitationReader,
+    SQLAlchemyUserRequestReader,
+    UserRequestMapper,
+)
+from app.infrastructure.gateways.user import SQLAlchemyUserReader, UserMapper
 from app.infrastructure.jwt.config import Auth0Config, JWTConfig
 from app.infrastructure.jwt.jwt_processor import JWTProcessor, PyJWTProcessor
 from app.infrastructure.persistence.commiter import SACommiter
 from app.infrastructure.persistence.config import DBConfig
-from app.infrastructure.persistence.gateways.company import (
-    CompanyMapper,
-    CompanyUserMapper,
-    SQLAlchemyCompanyReader,
-)
-from app.infrastructure.persistence.gateways.user import (
-    SQLAlchemyUserReader,
-    UserMapper,
-)
 from app.infrastructure.persistence.provider import (
     get_async_session,
     get_async_sessionmaker,
@@ -86,6 +114,31 @@ def gateway_provider() -> Provider:
 
     provider.provide(
         CompanyUserMapper, scope=Scope.REQUEST, provides=CompanyUserGateway
+    )
+
+    provider.provide(
+        InvitationMapper, scope=Scope.REQUEST, provides=InvitationGateway
+    )
+    provider.provide(
+        SQLAlchemyInvitationReader,
+        scope=Scope.REQUEST,
+        provides=InvitationReader,
+    )
+
+    provider.provide(
+        UserRequestMapper, scope=Scope.REQUEST, provides=UserRequestGateway
+    )
+
+    provider.provide(
+        SQLAlchemyCompanyUserReader,
+        scope=Scope.REQUEST,
+        provides=CompanyUserReader,
+    )
+
+    provider.provide(
+        SQLAlchemyUserRequestReader,
+        scope=Scope.REQUEST,
+        provides=UserRequestReader,
     )
 
     provider.provide(
@@ -127,6 +180,21 @@ def interactor_provider() -> Provider:
         EditCompanyDescription,
         EditCompanyName,
         EditCompanyVisibility,
+        LeaveFromCompany,
+        RemoveUserFromCompany,
+        scope=Scope.REQUEST,
+    )
+
+    provider.provide_all(
+        SendInvitationToUser,
+        SendRequestFromUser,
+        RejectUserRequest,
+        RejectInvitation,
+        AcceptUserRequest,
+        AcceptInvitation,
+        GetInvitations,
+        GetUserRequests,
+        GetCompanyUsers,
         scope=Scope.REQUEST,
     )
 
@@ -207,10 +275,10 @@ class HTTPProvider(Provider):
 
     @provide(scope=Scope.REQUEST)
     def get_idp(
-        self, token_auth: TokenAuth, user_reader: UserReader
+        self, token_auth: TokenAuth, user_gateway: UserGateway
     ) -> IdProvider:
         token = token_auth.get_access_token()
-        id_provider = TokenIdProvider(token, user_reader)
+        id_provider = TokenIdProvider(token, user_gateway)
 
         return id_provider
 

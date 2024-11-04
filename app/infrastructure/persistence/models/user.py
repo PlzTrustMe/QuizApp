@@ -52,6 +52,16 @@ def map_users_table() -> None:
                 back_populates="user",
                 cascade="all, delete-orphan",
             ),
+            "invitation": relationship(
+                "Invitation",
+                back_populates="user",
+                cascade="all, delete-orphan",
+            ),
+            "user_request": relationship(
+                "UserRequest",
+                back_populates="user",
+                cascade="all, delete-orphan",
+            ),
             "full_name": composite(
                 FullName, users_table.c.first_name, users_table.c.last_name
             ),

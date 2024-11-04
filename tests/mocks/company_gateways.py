@@ -51,12 +51,28 @@ class FakeCompanyUserMapper(CompanyUserGateway):
         self.company_user = CompanyUser(
             company_user_id=CompanyUserId(1),
             company_id=CompanyId(1),
-            user_id=UserId(1),
+            user_id=UserId(2),
             role=CompanyRole.OWNER,
         )
 
         self.saved = False
+        self.deleted = False
 
     async def add(self, company_user: CompanyUser) -> None:
         self.company_user.role = company_user.role
         self.saved = True
+
+    async def is_exist(self, company_id: CompanyId, user_id: UserId) -> bool:
+        return (
+            self.company_user.user_id == user_id
+            and self.company_user.company_id == company_id
+        )
+
+    async def by_identity(self, user_id: UserId) -> CompanyUser | None:
+        if self.company_user.user_id == user_id:
+            return self.company_user
+        return None
+
+    async def delete(self, company_user_id: CompanyUserId) -> None:
+        if self.company_user.company_user_id == company_user_id:
+            self.deleted = True

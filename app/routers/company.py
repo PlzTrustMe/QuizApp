@@ -28,6 +28,14 @@ from app.core.commands.company.errors import (
     CompanyNotFoundError,
     CompanyWithNameAlreadyExistError,
 )
+from app.core.commands.company.leave_from_company import (
+    LeaveFromCompany,
+    LeaveFromCompanyInputData,
+)
+from app.core.commands.company.remove_user_from_company import (
+    RemoveUserFromCompany,
+    RemoveUserFromCompanyInputData,
+)
 from app.core.commands.user.errors import AccessDeniedError, UnauthorizedError
 from app.core.common.pagination import Pagination, SortOrder
 from app.core.entities.company import CompanyId, Visibility
@@ -36,10 +44,19 @@ from app.core.entities.errors import (
     CompanyNameTooLongError,
     EmptyError,
 )
-from app.core.interfaces.company_gateways import CompanyDetail, CompanyFilters
+from app.core.interfaces.company_gateways import (
+    CompanyDetail,
+    CompanyFilters,
+    CompanyUserFilters,
+)
 from app.core.queries.company.get_company_by_id import (
     GetCompanyById,
     GetCompanyByIdInputData,
+)
+from app.core.queries.company.get_company_users import (
+    GetCompanyUsers,
+    GetCompanyUsersInputData,
+    GetCompanyUsersOutputData,
 )
 from app.core.queries.company.get_many_companies import (
     GetManyCompanies,
@@ -118,6 +135,24 @@ async def get_many_companies(
     response = await action(
         GetManyCompaniesInputData(
             filters=CompanyFilters(visibility=visibility),
+            pagination=Pagination(offset, limit, order),
+        )
+    )
+
+    return OkResponse(result=response)
+
+
+@company_router.get("/users/{company_id}")
+async def get_company_users(
+    action: FromDishka[GetCompanyUsers],
+    company_id: int,
+    offset: Annotated[int, Query(ge=0)] = 0,
+    limit: Annotated[int, Query(ge=1, le=1000)] = 1000,
+    order: SortOrder = SortOrder.ASC,
+) -> OkResponse[GetCompanyUsersOutputData]:
+    response = await action(
+        GetCompanyUsersInputData(
+            filters=CompanyUserFilters(company_id=company_id),
             pagination=Pagination(offset, limit, order),
         )
     )
@@ -211,7 +246,7 @@ async def edit_company_visibility(
 
 
 @company_router.delete(
-    "/company_id}",
+    "/{company_id}",
     responses={
         status.HTTP_200_OK: {"model": OkResponse},
         status.HTTP_401_UNAUTHORIZED: {
@@ -229,3 +264,21 @@ async def delete_company(
     await action(DeleteCompanyInputData(company_id))
 
     return OkResponse()
+
+
+@company_router.delete("/remove-user/{company_id}/{user_id}")
+async def remove_user_from_company(
+    company_id: int, user_id: int, action: FromDishka[RemoveUserFromCompany]
+) -> OkResponse:
+    await action(
+        RemoveUserFromCompanyInputData(company_id=company_id, user_id=user_id)
+    )
+
+    return OkResponse()
+
+
+@company_router.delete("/leave/{company_id}")
+async def leave_from_company(
+    company_id: int, action: FromDishka[LeaveFromCompany]
+):
+    await action(LeaveFromCompanyInputData(company_id=company_id))

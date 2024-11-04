@@ -51,18 +51,17 @@ class CompanyDescription:
 
 @dataclass(slots=True, frozen=True, eq=True, unsafe_hash=True)
 class FullName:
-    first_name: str
-    last_name: str
+    first_name: str | None
+    last_name: str | None
 
     def __post_init__(self) -> None:
         max_length = 15
 
-        if not self.first_name or not self.last_name:
-            raise EmptyError()
-        if len(self.first_name) > max_length:
-            raise FirstNameTooLongError(self.first_name)
-        if len(self.last_name) > max_length:
-            raise LastNameTooLongError(self.last_name)
+        if self.first_name and self.last_name:
+            if len(self.first_name) > max_length:
+                raise FirstNameTooLongError(self.first_name)
+            if len(self.last_name) > max_length:
+                raise LastNameTooLongError(self.last_name)
 
     @property
     def full_name(self):

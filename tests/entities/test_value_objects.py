@@ -22,7 +22,6 @@ from app.core.entities.value_objects import (
     ["first_name", "last_name", "exc_class"],
     [
         ("Test", "Testovich", None),
-        ("", "Testovich", EmptyError),
         ("A" * 16, "Testovich", FirstNameTooLongError),
         ("Test", "B" * 16, LastNameTooLongError),
     ],

@@ -1,19 +1,31 @@
-from sqlalchemy import RowMapping, Select, delete, exists, func, select
+from sqlalchemy import RowMapping, Select, and_, delete, exists, func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.commands.user.errors import UnexpectedError
 from app.core.common.pagination import Pagination, SortOrder
-from app.core.entities.company import Company, CompanyId, CompanyUser
+from app.core.entities.company import (
+    Company,
+    CompanyId,
+    CompanyUser,
+    CompanyUserId,
+)
+from app.core.entities.user import UserId
 from app.core.entities.value_objects import CompanyName
 from app.core.interfaces.company_gateways import (
     CompanyDetail,
     CompanyFilters,
     CompanyGateway,
     CompanyReader,
+    CompanyUserDetail,
+    CompanyUserFilters,
     CompanyUserGateway,
+    CompanyUserReader,
 )
 from app.infrastructure.persistence.models.company import companies_table
+from app.infrastructure.persistence.models.company_user import (
+    company_users_table,
+)
 
 
 class CompanyMapper(CompanyGateway):
@@ -65,6 +77,36 @@ class CompanyUserMapper(CompanyUserGateway):
             await self.session.flush()
         except IntegrityError as error:
             raise UnexpectedError from error
+
+    async def is_exist(self, company_id: CompanyId, user_id: UserId) -> bool:
+        query = select(
+            exists().where(
+                and_(
+                    company_users_table.c.company_id == company_id,
+                    company_users_table.c.user_id == user_id,
+                )
+            )
+        )
+
+        result = await self.session.execute(query)
+
+        return result.scalar()
+
+    async def by_identity(self, user_id: UserId) -> CompanyUser | None:
+        query = select(CompanyUser).where(
+            company_users_table.c.user_id == user_id
+        )
+
+        result = await self.session.execute(query)
+
+        return result.scalar_one_or_none()
+
+    async def delete(self, company_user_id: CompanyUserId) -> None:
+        query = delete(CompanyUser).where(
+            company_users_table.c.company_user_id == company_user_id
+        )
+
+        await self.session.execute(query)
 
 
 class SQLAlchemyCompanyReader(CompanyReader):
@@ -133,6 +175,51 @@ class SQLAlchemyCompanyReader(CompanyReader):
 
         if filters:
             query = self._make_filters(query, filters)
+
+        total: int = await self.session.scalar(query)
+
+        return total
+
+
+class SQLAlchemyCompanyUserReader(CompanyUserReader):
+    def __init__(self, session: AsyncSession):
+        self.session = session
+
+    def _load_model(self, row: RowMapping) -> CompanyUserDetail:
+        return CompanyUserDetail(
+            company_user_id=row.company_user_id,
+            user_id=row.user_id,
+            role=row.role,
+        )
+
+    async def many(
+        self, filters: CompanyUserFilters, pagination: Pagination
+    ) -> list[CompanyUserDetail]:
+        query = select(
+            company_users_table.c.company_user_id,
+            company_users_table.c.user_id,
+            company_users_table.c.role,
+        ).where(company_users_table.c.company_id == filters.company_id)
+
+        if pagination.order is SortOrder.ASC:
+            query = query.order_by(company_users_table.c.created_at.asc())
+        else:
+            query = query.order_by(company_users_table.c.created_at.desc())
+
+        if pagination.offset is not None:
+            query = query.offset(pagination.offset)
+        if pagination.limit is not None:
+            query = query.limit(pagination.limit)
+
+        result = await self.session.execute(query)
+
+        return [self._load_model(row) for row in result.mappings()]
+
+    async def total(self, filters: CompanyUserFilters) -> int:
+        query = select(func.count(company_users_table.c.company_user_id))
+        query = query.where(
+            company_users_table.c.company_id == filters.company_id
+        )
 
         total: int = await self.session.scalar(query)
 
