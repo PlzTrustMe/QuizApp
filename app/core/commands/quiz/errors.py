@@ -25,3 +25,12 @@ class InvalidAnswersValidateError(ApplicationError):
     @property
     def message(self) -> str:
         return "There must be at least one correct answer per quiz"
+
+
+@dataclass(eq=False)
+class QuizNotFoundError(ApplicationError):
+    quiz_id: int
+
+    @property
+    def message(self) -> str:
+        return f"Quiz with id {self.quiz_id} not found"

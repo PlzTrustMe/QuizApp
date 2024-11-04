@@ -101,3 +101,15 @@ class AccessService:
             await self._is_owner(company)
         except AccessDeniedError:
             await self._is_admin(company)
+
+    async def ensure_can_edit_quiz(self, company: Company):
+        try:
+            await self._is_owner(company)
+        except AccessDeniedError:
+            await self._is_admin(company)
+
+    async def ensure_can_delete_quiz(self, company: Company):
+        try:
+            await self._is_owner(company)
+        except AccessDeniedError:
+            await self._is_admin(company)

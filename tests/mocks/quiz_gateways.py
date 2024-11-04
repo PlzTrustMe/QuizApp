@@ -31,6 +31,9 @@ class FakeQuizMapper(QuizGateway):
 
         self.saved = True
 
+    async def by_id(self, quiz_id: QuizId) -> Quiz | None:
+        return self.quiz if self.quiz.quiz_id == quiz_id else None
+
 
 class FakeQuestionMapper(QuestionGateway):
     def __init__(self):
