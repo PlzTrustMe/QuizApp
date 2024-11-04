@@ -121,7 +121,7 @@ def map_quizzes_table() -> None:
 def map_questions_table() -> None:
     mapper_registry.map_imperatively(
         Question,
-        quizzes_table,
+        questions_table,
         properties={
             "quiz": relationship("Quiz", back_populates="question"),
             "answer": relationship(
