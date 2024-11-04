@@ -34,6 +34,9 @@ from app.core.commands.invitation.send_invitation_to_user import (
 from app.core.commands.invitation.send_request_from_user import (
     SendRequestFromUser,
 )
+from app.core.commands.quiz.create_quiz import CreateQuiz
+from app.core.commands.quiz.delete_quiz import DeleteQuiz
+from app.core.commands.quiz.edit_quiz_title import EditQuizTitle
 from app.core.commands.user.delete_user import DeleteUser
 from app.core.commands.user.edit_full_name import EditFullName
 from app.core.commands.user.edit_password import EditPassword
@@ -56,6 +59,11 @@ from app.core.interfaces.invitation_gateways import (
     UserRequestReader,
 )
 from app.core.interfaces.password_hasher import PasswordHasher
+from app.core.interfaces.quiz_gateways import (
+    AnswerGateway,
+    QuestionGateway,
+    QuizGateway,
+)
 from app.core.interfaces.user_gateways import UserGateway, UserReader
 from app.core.queries.company.get_company_by_id import GetCompanyById
 from app.core.queries.company.get_company_users import GetCompanyUsers
@@ -82,6 +90,11 @@ from app.infrastructure.gateways.invite import (
     SQLAlchemyInvitationReader,
     SQLAlchemyUserRequestReader,
     UserRequestMapper,
+)
+from app.infrastructure.gateways.quiz import (
+    AnswerMapper,
+    QuestionMapper,
+    QuizMapper,
 )
 from app.infrastructure.gateways.user import SQLAlchemyUserReader, UserMapper
 from app.infrastructure.jwt.config import Auth0Config, JWTConfig
@@ -141,6 +154,12 @@ def gateway_provider() -> Provider:
         provides=UserRequestReader,
     )
 
+    provider.provide(QuizMapper, scope=Scope.REQUEST, provides=QuizGateway)
+    provider.provide(
+        QuestionMapper, scope=Scope.REQUEST, provides=QuestionGateway
+    )
+    provider.provide(AnswerMapper, scope=Scope.REQUEST, provides=AnswerGateway)
+
     provider.provide(
         SACommiter,
         scope=Scope.REQUEST,
@@ -196,6 +215,10 @@ def interactor_provider() -> Provider:
         GetUserRequests,
         GetCompanyUsers,
         scope=Scope.REQUEST,
+    )
+
+    provider.provide_all(
+        CreateQuiz, DeleteQuiz, EditQuizTitle, scope=Scope.REQUEST
     )
 
     return provider
