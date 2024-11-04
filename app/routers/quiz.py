@@ -1,6 +1,8 @@
+from typing import Annotated
+
 from dishka import FromDishka
 from dishka.integrations.fastapi import DishkaRoute
-from fastapi import APIRouter, status
+from fastapi import APIRouter, Query, status
 
 from app.core.commands.quiz.create_quiz import (
     AnswerData,
@@ -13,7 +15,14 @@ from app.core.commands.quiz.edit_quiz_title import (
     EditQuizTitle,
     EditQuizTitleInputData,
 )
+from app.core.common.pagination import Pagination, SortOrder
 from app.core.entities.quiz import QuizId
+from app.core.interfaces.quiz_gateways import QuizFilters
+from app.core.queries.quiz.get_quizzes import (
+    GetAllQuizzes,
+    GetAllQuizzesInputData,
+    GetAllQuizzesOutputData,
+)
 from app.routers.responses.base import OkResponse
 from app.schemas.quiz import CreateQuizSchema, EditQuizTitleSchema
 
@@ -23,6 +32,23 @@ quiz_router = APIRouter(
     responses={status.HTTP_404_NOT_FOUND: {"description": "Not Found"}},
     route_class=DishkaRoute,
 )
+
+
+@quiz_router.get("/{company_id}", status_code=status.HTTP_200_OK)
+async def get_all_quizzes(
+    action: FromDishka[GetAllQuizzes],
+    company_id: int,
+    offset: Annotated[int, Query(ge=0)] = 0,
+    limit: Annotated[int, Query(ge=1, le=1000)] = 1000,
+    order: SortOrder = SortOrder.ASC,
+) -> OkResponse[GetAllQuizzesOutputData]:
+    output_data = await action(
+        GetAllQuizzesInputData(
+            QuizFilters(company_id), Pagination(offset, limit, order)
+        )
+    )
+
+    return OkResponse(result=output_data)
 
 
 @quiz_router.post("", status_code=status.HTTP_201_CREATED)
