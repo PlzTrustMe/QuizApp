@@ -24,6 +24,7 @@ class FakeQuizMapper(QuizGateway):
         )
 
         self.saved = False
+        self.deleted = False
 
     async def add(self, quiz: Quiz) -> None:
         self.quiz.title = quiz.title
@@ -33,6 +34,10 @@ class FakeQuizMapper(QuizGateway):
 
     async def by_id(self, quiz_id: QuizId) -> Quiz | None:
         return self.quiz if self.quiz.quiz_id == quiz_id else None
+
+    async def delete(self, quiz_id: QuizId) -> None:
+        if self.quiz.quiz_id == quiz_id:
+            self.deleted = True
 
 
 class FakeQuestionMapper(QuestionGateway):

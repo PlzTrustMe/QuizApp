@@ -13,6 +13,10 @@ class QuizGateway(Protocol):
     async def by_id(self, quiz_id: QuizId) -> Quiz | None:
         raise NotImplementedError
 
+    @abstractmethod
+    async def delete(self, quiz_id: QuizId) -> None:
+        raise NotImplementedError
+
 
 class QuestionGateway(Protocol):
     @abstractmethod
