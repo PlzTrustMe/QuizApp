@@ -70,6 +70,9 @@ def map_companies_table() -> None:
                 back_populates="company",
                 cascade="all, delete-orphan",
             ),
+            "quiz": relationship(
+                "Quiz", back_populates="company", cascade="all, delete-orphan"
+            ),
             "name": composite(CompanyName, companies_table.c.company_name),
             "description": composite(
                 CompanyDescription, companies_table.c.company_description
