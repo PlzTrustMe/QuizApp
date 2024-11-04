@@ -1,3 +1,4 @@
+from app.core.commands.company.errors import CompanyUserNotFoundError
 from app.core.commands.invitation.errors import CompanyUserAlreadyExistError
 from app.core.commands.user.errors import AccessDeniedError
 from app.core.entities.company import Company, CompanyId, CompanyRole
@@ -31,6 +32,8 @@ class AccessService:
         company_user = await self.company_user_gateway.by_identity(
             company.company_id, actor.user_id
         )
+        if not company_user:
+            raise CompanyUserNotFoundError()
 
         if company_user.role != CompanyRole.ADMIN:
             raise AccessDeniedError()

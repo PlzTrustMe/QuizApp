@@ -92,9 +92,14 @@ class CompanyUserMapper(CompanyUserGateway):
 
         return result.scalar()
 
-    async def by_identity(self, user_id: UserId) -> CompanyUser | None:
+    async def by_identity(
+        self, user_id: UserId, company_id: CompanyId
+    ) -> CompanyUser | None:
         query = select(CompanyUser).where(
-            company_users_table.c.user_id == user_id
+            and_(
+                company_users_table.c.user_id == user_id,
+                company_users_table.c.company_id == company_id,
+            )
         )
 
         result = await self.session.execute(query)
