@@ -38,7 +38,7 @@ from app.core.commands.company.remove_user_from_company import (
 )
 from app.core.commands.user.errors import AccessDeniedError, UnauthorizedError
 from app.core.common.pagination import Pagination, SortOrder
-from app.core.entities.company import CompanyId, Visibility
+from app.core.entities.company import CompanyId, CompanyRole, Visibility
 from app.core.entities.errors import (
     CompanyDescriptionTooLongError,
     CompanyNameTooLongError,
@@ -146,13 +146,16 @@ async def get_many_companies(
 async def get_company_users(
     action: FromDishka[GetCompanyUsers],
     company_id: int,
+    company_role: CompanyRole | None = None,
     offset: Annotated[int, Query(ge=0)] = 0,
     limit: Annotated[int, Query(ge=1, le=1000)] = 1000,
     order: SortOrder = SortOrder.ASC,
 ) -> OkResponse[GetCompanyUsersOutputData]:
     response = await action(
         GetCompanyUsersInputData(
-            filters=CompanyUserFilters(company_id=company_id),
+            filters=CompanyUserFilters(
+                company_id=company_id, company_role=company_role
+            ),
             pagination=Pagination(offset, limit, order),
         )
     )

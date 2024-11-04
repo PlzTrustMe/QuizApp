@@ -83,3 +83,6 @@ class AccessService:
 
     async def ensure_can_delete_from_company(self, company: Company):
         await self._is_owner(company)
+
+    async def ensure_can_edit_member_role(self, company: Company):
+        await self._is_owner(company)
