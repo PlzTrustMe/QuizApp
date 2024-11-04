@@ -43,8 +43,14 @@ class CompanyUserGateway(Protocol):
         raise NotImplementedError
 
     @abstractmethod
-    async def by_identity(
+    async def by_company(
         self, company_id: CompanyId, user_id: UserId
+    ) -> CompanyUser | None:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def by_id(
+        self, company_user_id: CompanyUserId
     ) -> CompanyUser | None:
         raise NotImplementedError
 
@@ -91,11 +97,16 @@ class CompanyUserFilters:
 @dataclass(frozen=True)
 class CompanyUserDetail:
     company_user_id: int
+    company_id: int
     user_id: int
     role: CompanyRole
 
 
 class CompanyUserReader(Protocol):
+    @abstractmethod
+    async def by_id(self, company_user_id: CompanyUserId) -> CompanyUserDetail:
+        raise NotImplementedError
+
     @abstractmethod
     async def many(
         self, filters: CompanyUserFilters, pagination: Pagination

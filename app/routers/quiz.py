@@ -15,16 +15,30 @@ from app.core.commands.quiz.edit_quiz_title import (
     EditQuizTitle,
     EditQuizTitleInputData,
 )
+from app.core.commands.quiz.save_quiz_result import (
+    SaveQuizResult,
+    SaveQuizResultInputData,
+)
+from app.core.commands.quiz.take_quiz import TakeQuiz, TakeQuizInputData
 from app.core.common.pagination import Pagination, SortOrder
-from app.core.entities.quiz import QuizId
+from app.core.entities.quiz import QuizId, QuizParticipationId, QuizResultId
 from app.core.interfaces.quiz_gateways import QuizFilters
+from app.core.queries.quiz.get_all_quiz_result import (
+    GetAllQuizResult,
+    GetAllQuizResultOutputData,
+)
 from app.core.queries.quiz.get_quizzes import (
     GetAllQuizzes,
     GetAllQuizzesInputData,
     GetAllQuizzesOutputData,
 )
 from app.routers.responses.base import OkResponse
-from app.schemas.quiz import CreateQuizSchema, EditQuizTitleSchema
+from app.schemas.quiz import (
+    CreateQuizSchema,
+    EditQuizTitleSchema,
+    SaveQuizResultSchema,
+    TakeQuizSchema,
+)
 
 quiz_router = APIRouter(
     prefix="/quiz",
@@ -32,6 +46,15 @@ quiz_router = APIRouter(
     responses={status.HTTP_404_NOT_FOUND: {"description": "Not Found"}},
     route_class=DishkaRoute,
 )
+
+
+@quiz_router.get("/average")
+async def get_all_quizzes_average(
+    action: FromDishka[GetAllQuizResult],
+) -> OkResponse[GetAllQuizResultOutputData]:
+    output_data = await action()
+
+    return OkResponse(result=output_data)
 
 
 @quiz_router.get("/{company_id}", status_code=status.HTTP_200_OK)
@@ -72,6 +95,29 @@ async def create_new_quiz(
             title=body.title,
             description=body.description,
             questions=question_data,
+        )
+    )
+
+    return OkResponse(status=201, result=output_data)
+
+
+@quiz_router.post("/take", status_code=status.HTTP_201_CREATED)
+async def take_quiz(
+    body: TakeQuizSchema, action: FromDishka[TakeQuiz]
+) -> OkResponse[QuizParticipationId]:
+    output_data = await action(TakeQuizInputData(quiz_id=body.quiz_id))
+
+    return OkResponse(status=201, result=output_data)
+
+
+@quiz_router.post("/save-result", status_code=status.HTTP_201_CREATED)
+async def save_quiz_result(
+    body: SaveQuizResultSchema, action: FromDishka[SaveQuizResult]
+) -> OkResponse[QuizResultId]:
+    output_data = await action(
+        SaveQuizResultInputData(
+            participation_id=body.participation_id,
+            correct_answers=body.correct_answers,
         )
     )
 

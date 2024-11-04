@@ -53,6 +53,11 @@ from app.core.queries.company.get_company_by_id import (
     GetCompanyById,
     GetCompanyByIdInputData,
 )
+from app.core.queries.company.get_company_user import (
+    GetCompanyOutputData,
+    GetCompanyUser,
+    GetCompanyUserInputData,
+)
 from app.core.queries.company.get_company_users import (
     GetCompanyUsers,
     GetCompanyUsersInputData,
@@ -161,6 +166,15 @@ async def get_company_users(
     )
 
     return OkResponse(result=response)
+
+
+@company_router.get("/user/{company_user_id}")
+async def get_company_user(
+    company_user_id: int, action: FromDishka[GetCompanyUser]
+) -> OkResponse[GetCompanyOutputData]:
+    output_data = await action(GetCompanyUserInputData(company_user_id))
+
+    return OkResponse(result=output_data)
 
 
 @company_router.put(

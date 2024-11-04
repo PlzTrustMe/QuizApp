@@ -20,3 +20,12 @@ class CreateQuizSchema(BaseModel):
 
 class EditQuizTitleSchema(BaseModel):
     new_title: str
+
+
+class TakeQuizSchema(BaseModel):
+    quiz_id: int
+
+
+class SaveQuizResultSchema(BaseModel):
+    participation_id: int
+    correct_answers: int

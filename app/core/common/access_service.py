@@ -29,7 +29,7 @@ class AccessService:
 
     async def _is_admin(self, company: Company):
         actor = await self.id_provider.get_user()
-        company_user = await self.company_user_gateway.by_identity(
+        company_user = await self.company_user_gateway.by_company(
             company.company_id, actor.user_id
         )
         if not company_user:

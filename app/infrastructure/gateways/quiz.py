@@ -1,10 +1,19 @@
-from sqlalchemy import and_, delete, func, select
+from sqlalchemy import Float, and_, cast, delete, func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.commands.user.errors import UnexpectedError
 from app.core.common.pagination import Pagination, SortOrder
-from app.core.entities.quiz import Answer, Question, Quiz, QuizId
+from app.core.entities.company import CompanyId, CompanyUserId
+from app.core.entities.quiz import (
+    Answer,
+    Question,
+    Quiz,
+    QuizId,
+    QuizParticipation,
+    QuizParticipationId,
+    QuizResult,
+)
 from app.core.interfaces.quiz_gateways import (
     AnswerDetail,
     AnswerGateway,
@@ -13,11 +22,15 @@ from app.core.interfaces.quiz_gateways import (
     QuizDetail,
     QuizFilters,
     QuizGateway,
+    QuizParticipationGateway,
     QuizReader,
+    QuizResultGateway,
 )
 from app.infrastructure.persistence.models.quiz import (
     answers_table,
     questions_table,
+    quiz_participations_table,
+    quiz_results_table,
     quizzes_table,
 )
 
@@ -66,6 +79,44 @@ class AnswerMapper(AnswerGateway):
 
     async def add_many(self, answers: list[Answer]) -> None:
         self.session.add_all(answers)
+
+        try:
+            await self.session.flush()
+        except IntegrityError as error:
+            raise UnexpectedError from error
+
+
+class QuizParticipationMapper(QuizParticipationGateway):
+    def __init__(self, session: AsyncSession):
+        self.session = session
+
+    async def add(self, participation: QuizParticipation) -> None:
+        self.session.add(participation)
+
+        try:
+            await self.session.flush()
+        except IntegrityError as error:
+            raise UnexpectedError from error
+
+    async def by_id(
+        self, quiz_participation_id: QuizParticipationId
+    ) -> QuizParticipation | None:
+        query = select(QuizParticipation).where(
+            quiz_participations_table.c.quiz_participation_id
+            == quiz_participation_id
+        )
+
+        result = await self.session.execute(query)
+
+        return result.scalar_one_or_none()
+
+
+class QuizResultMapper(QuizResultGateway):
+    def __init__(self, session: AsyncSession):
+        self.session = session
+
+    async def add(self, quiz_result: QuizResult) -> None:
+        self.session.add(quiz_result)
 
         try:
             await self.session.flush()
@@ -171,3 +222,83 @@ class SQLAlchemyQuizReader(QuizReader):
         total: int = await self.session.scalar(query)
 
         return total
+
+    async def total_average_user_score(
+        self, company_user_id: CompanyUserId, company_id: CompanyId
+    ) -> float:
+        total_possible_correct_answers_query = (
+            select(func.count(answers_table.c.answer_id))
+            .join(
+                questions_table,
+                and_(
+                    questions_table.c.question_id
+                    == answers_table.c.question_id
+                ),
+            )
+            .join(
+                quizzes_table,
+                and_(quizzes_table.c.quiz_id == questions_table.c.quiz_id),
+            )
+            .where(
+                quizzes_table.c.company_id == company_id,
+                answers_table.c.is_correct.is_(True),
+            )
+            .label("total_possible_correct_answers")
+        )
+
+        user_correct_answers_query = (
+            select(func.count(quiz_results_table.c.correct_answers))
+            .join(
+                quiz_participations_table,
+                and_(
+                    quiz_participations_table.c.quiz_participation_id
+                    == quiz_results_table.c.quiz_participation_id
+                ),
+            )
+            .where(
+                and_(
+                    quiz_participations_table.c.company_user_id
+                    == company_user_id,
+                    quiz_participations_table.c.quiz_id
+                    == quizzes_table.c.quiz_id,
+                    quizzes_table.c.company_id == company_id,
+                )
+            )
+            .label("user_correct_answers")
+        )
+
+        query = select(
+            (
+                cast(user_correct_answers_query, Float)
+                / cast(total_possible_correct_answers_query, Float)
+                * 100
+            ).label("accuracy_percentage")
+        )
+
+        result = await self.session.execute(query)
+        accuracy_percentage = result.scalar()
+        return accuracy_percentage
+
+    async def total_average(self) -> float:
+        total_possible_correct_answers_query = (
+            select(func.count(answers_table.c.answer_id))
+            .where(answers_table.c.is_correct.is_(True))
+            .scalar_subquery()
+        )
+
+        total_user_correct_answers_query = select(
+            func.sum(quiz_results_table.c.correct_answers)
+        ).scalar_subquery()
+
+        query = select(
+            (
+                cast(total_user_correct_answers_query, Float)
+                / cast(total_possible_correct_answers_query, Float)
+                * 100
+            ).label("average_score_percentage")
+        )
+
+        result = await self.session.execute(query)
+        average_score_percentage = result.scalar()
+
+        return average_score_percentage

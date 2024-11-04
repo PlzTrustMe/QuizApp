@@ -34,7 +34,7 @@ class LeaveFromCompany:
         company = await self.company_gateway.by_id(company_id)
         if not company:
             raise CompanyNotFoundError(company_id)
-        company_user = await self.company_user_gateway.by_identity(
+        company_user = await self.company_user_gateway.by_company(
             company_id, user.user_id
         )
         if not company_user:

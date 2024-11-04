@@ -92,8 +92,8 @@ class CompanyUserMapper(CompanyUserGateway):
 
         return result.scalar()
 
-    async def by_identity(
-        self, user_id: UserId, company_id: CompanyId
+    async def by_company(
+        self, company_id: CompanyId, user_id: UserId
     ) -> CompanyUser | None:
         query = select(CompanyUser).where(
             and_(
@@ -193,6 +193,7 @@ class SQLAlchemyCompanyUserReader(CompanyUserReader):
     def _load_model(self, row: RowMapping) -> CompanyUserDetail:
         return CompanyUserDetail(
             company_user_id=row.company_user_id,
+            company_id=row.company_id,
             user_id=row.user_id,
             role=row.role,
         )
@@ -207,11 +208,25 @@ class SQLAlchemyCompanyUserReader(CompanyUserReader):
 
         return query
 
+    async def by_id(self, company_user_id: CompanyUserId) -> CompanyUserDetail:
+        query = select(
+            company_users_table.c.company_user_id,
+            company_users_table.c.company_id,
+            company_users_table.c.user_id,
+            company_users_table.c.role,
+        ).where(company_users_table.c.company_user_id == company_user_id)
+
+        result = await self.session.execute(query)
+        row = result.mappings().one_or_none()
+
+        return None if not row else self._load_model(row)
+
     async def many(
         self, filters: CompanyUserFilters, pagination: Pagination
     ) -> list[CompanyUserDetail]:
         query = select(
             company_users_table.c.company_user_id,
+            company_users_table.c.company_id,
             company_users_table.c.user_id,
             company_users_table.c.role,
         ).where(company_users_table.c.company_id == filters.company_id)

@@ -22,6 +22,7 @@ from app.core.commands.quiz.errors import (
     InvalidAnswersValidateError,
     InvalidQuestionQuantityError,
     QuizNotFoundError,
+    QuizParticipationNotFoundError,
 )
 from app.core.commands.user.errors import (
     AccessDeniedError,
@@ -86,6 +87,10 @@ def setup_exception_handlers(app: FastAPI) -> None:
     )
     app.add_exception_handler(
         QuizNotFoundError, error_handler(status.HTTP_404_NOT_FOUND)
+    )
+    app.add_exception_handler(
+        QuizParticipationNotFoundError,
+        error_handler(status.HTTP_404_NOT_FOUND),
     )
     app.add_exception_handler(
         UserNotFoundError, error_handler(status.HTTP_404_NOT_FOUND)

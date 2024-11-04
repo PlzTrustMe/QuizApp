@@ -3,7 +3,16 @@ from asyncio import Protocol
 from dataclasses import dataclass
 
 from app.core.common.pagination import Pagination
-from app.core.entities.quiz import Answer, Question, Quiz, QuizId
+from app.core.entities.company import CompanyId, CompanyUserId
+from app.core.entities.quiz import (
+    Answer,
+    Question,
+    Quiz,
+    QuizId,
+    QuizParticipation,
+    QuizParticipationId,
+    QuizResult,
+)
 
 
 class QuizGateway(Protocol):
@@ -17,6 +26,24 @@ class QuizGateway(Protocol):
 
     @abstractmethod
     async def delete(self, quiz_id: QuizId) -> None:
+        raise NotImplementedError
+
+
+class QuizParticipationGateway(Protocol):
+    @abstractmethod
+    async def add(self, participation: QuizParticipation) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def by_id(
+        self, quiz_participation_id: QuizParticipationId
+    ) -> QuizParticipation | None:
+        raise NotImplementedError
+
+
+class QuizResultGateway(Protocol):
+    @abstractmethod
+    async def add(self, quiz_result: QuizResult) -> None:
         raise NotImplementedError
 
 
@@ -69,4 +96,14 @@ class QuizReader(Protocol):
 
     @abstractmethod
     async def total(self, filters: QuizFilters) -> int:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def total_average_user_score(
+        self, company_user_id: CompanyUserId, company_id: CompanyId
+    ) -> float:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def total_average(self) -> float:
         raise NotImplementedError
