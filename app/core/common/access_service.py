@@ -44,6 +44,12 @@ class AccessService:
         if await self.company_user_gateway.is_exist(company_id, user_id):
             raise CompanyUserAlreadyExistError(company_id, user_id)
 
+    async def _is_owner_or_admin(self, company: Company):
+        try:
+            await self._is_owner(company)
+        except AccessDeniedError:
+            await self._is_admin(company)
+
     async def ensure_can_edit_full_name(self, record_to_edit: User):
         await self._is_identity(record_to_edit.user_id)
 
@@ -100,19 +106,10 @@ class AccessService:
         await self._is_owner(company)
 
     async def ensure_can_create_quiz(self, company: Company):
-        try:
-            await self._is_owner(company)
-        except AccessDeniedError:
-            await self._is_admin(company)
+        await self._is_owner_or_admin(company)
 
     async def ensure_can_edit_quiz(self, company: Company):
-        try:
-            await self._is_owner(company)
-        except AccessDeniedError:
-            await self._is_admin(company)
+        await self._is_owner_or_admin(company)
 
     async def ensure_can_delete_quiz(self, company: Company):
-        try:
-            await self._is_owner(company)
-        except AccessDeniedError:
-            await self._is_admin(company)
+        await self._is_owner_or_admin(company)
