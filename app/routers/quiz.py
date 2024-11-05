@@ -27,7 +27,7 @@ from app.core.queries.quiz.get_all_quiz_average import (
     GetAllQuizAverage,
     GetAllQuizAverageOutputData,
 )
-from app.core.queries.quiz.get_my_quiz_result import (
+from app.core.queries.quiz.get_quiz_result import (
     GetMyQuizResult,
     GetMyQuizResultInputData,
     GetMyQuizResultOutputData,
@@ -66,7 +66,20 @@ async def get_all_quizzes_average(
 async def get_my_quiz_result(
     participation_id: int, action: FromDishka[GetMyQuizResult]
 ) -> OkResponse[GetMyQuizResultOutputData]:
-    output_data = await action(GetMyQuizResultInputData(participation_id))
+    output_data = await action.by_user(
+        GetMyQuizResultInputData(participation_id)
+    )
+
+    return OkResponse(result=output_data)
+
+
+@quiz_router.get("/company/{participation_id}", status_code=status.HTTP_200_OK)
+async def get_company_user_quiz_result(
+    participation_id: int, action: FromDishka[GetMyQuizResult]
+) -> OkResponse[GetMyQuizResultOutputData]:
+    output_data = await action.by_company(
+        GetMyQuizResultInputData(participation_id)
+    )
 
     return OkResponse(result=output_data)
 
