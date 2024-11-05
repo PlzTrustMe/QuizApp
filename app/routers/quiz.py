@@ -23,9 +23,9 @@ from app.core.commands.quiz.take_quiz import TakeQuiz, TakeQuizInputData
 from app.core.common.pagination import Pagination, SortOrder
 from app.core.entities.quiz import QuizId, QuizParticipationId, QuizResultId
 from app.core.interfaces.quiz_gateways import QuizFilters
-from app.core.queries.quiz.get_all_quiz_result import (
-    GetAllQuizResult,
-    GetAllQuizResultOutputData,
+from app.core.queries.quiz.get_all_quiz_average import (
+    GetAllQuizAverage,
+    GetAllQuizAverageOutputData,
 )
 from app.core.queries.quiz.get_quizzes import (
     GetAllQuizzes,
@@ -50,8 +50,8 @@ quiz_router = APIRouter(
 
 @quiz_router.get("/average")
 async def get_all_quizzes_average(
-    action: FromDishka[GetAllQuizResult],
-) -> OkResponse[GetAllQuizResultOutputData]:
+    action: FromDishka[GetAllQuizAverage],
+) -> OkResponse[GetAllQuizAverageOutputData]:
     output_data = await action()
 
     return OkResponse(result=output_data)
