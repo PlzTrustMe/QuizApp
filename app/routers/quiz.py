@@ -23,6 +23,11 @@ from app.core.commands.quiz.take_quiz import TakeQuiz, TakeQuizInputData
 from app.core.common.pagination import Pagination, SortOrder
 from app.core.entities.quiz import QuizId, QuizParticipationId, QuizResultId
 from app.core.interfaces.quiz_gateways import QuizFilters
+from app.core.queries.quiz.get_all_company_quiz_result import (
+    GetAllCompanyQuizResult,
+    GetAllCompanyQuizResultInputData,
+    GetAllCompanyQuizResultOutputData,
+)
 from app.core.queries.quiz.get_all_quiz_average import (
     GetAllQuizAverage,
     GetAllQuizAverageOutputData,
@@ -80,6 +85,15 @@ async def get_company_user_quiz_result(
     output_data = await action.by_company(
         GetMyQuizResultInputData(participation_id)
     )
+
+    return OkResponse(result=output_data)
+
+
+@quiz_router.get("/company/all/{company_id}", status_code=status.HTTP_200_OK)
+async def get_all_company_quiz_results(
+    company_id: int, action: FromDishka[GetAllCompanyQuizResult]
+) -> OkResponse[GetAllCompanyQuizResultOutputData]:
+    output_data = await action(GetAllCompanyQuizResultInputData(company_id))
 
     return OkResponse(result=output_data)
 

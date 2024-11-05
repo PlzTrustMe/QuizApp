@@ -77,6 +77,9 @@ from app.core.queries.company.get_company_users import GetCompanyUsers
 from app.core.queries.company.get_many_companies import GetManyCompanies
 from app.core.queries.invitation.get_invitations import GetInvitations
 from app.core.queries.invitation.get_user_requests import GetUserRequests
+from app.core.queries.quiz.get_all_company_quiz_result import (
+    GetAllCompanyQuizResult,
+)
 from app.core.queries.quiz.get_all_quiz_average import GetAllQuizAverage
 from app.core.queries.quiz.get_quiz_result import GetMyQuizResult
 from app.core.queries.quiz.get_quizzes import GetAllQuizzes
@@ -255,6 +258,7 @@ def interactor_provider() -> Provider:
         TakeQuiz,
         GetAllQuizAverage,
         GetMyQuizResult,
+        GetAllCompanyQuizResult,
         scope=Scope.REQUEST,
     )
 

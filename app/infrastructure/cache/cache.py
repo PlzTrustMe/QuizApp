@@ -24,3 +24,9 @@ class RedisCache(CacheGateway):
         data = await self.redis.get(key)
 
         return None if not data else self._convert_json_to_dict(data)
+
+    async def set_member_key(self, member_key: str, cached_key: str) -> None:
+        await self.redis.sadd(member_key, cached_key)
+
+    async def get_member_data(self, member_key: str) -> set | None:
+        return await self.redis.smembers(member_key)

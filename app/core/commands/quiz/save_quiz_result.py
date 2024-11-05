@@ -6,7 +6,7 @@ from app.core.commands.quiz.errors import (
     QuizParticipationNotFoundError,
 )
 from app.core.common.commiter import Commiter
-from app.core.entities.company import CompanyUserId
+from app.core.entities.company import CompanyId, CompanyUserId
 from app.core.entities.quiz import (
     QuizId,
     QuizParticipationId,
@@ -21,7 +21,7 @@ from app.core.interfaces.quiz_gateways import (
     QuizParticipationGateway,
     QuizResultGateway,
 )
-from app.utils.get_cache_key import get_quiz_result_cache_key
+from app.utils.get_cache_key import get_member_key, get_quiz_result_cache_key
 
 
 @dataclass(frozen=True)
@@ -75,6 +75,7 @@ class SaveQuizResult:
             quiz_participation.quiz_participation_id,
             quiz.quiz_id,
             company_user.company_user_id,
+            company_user.company_id,
             new_quiz_result,
         )
 
@@ -85,17 +86,21 @@ class SaveQuizResult:
         participation_id: QuizParticipationId,
         quiz_id: QuizId,
         company_user_id: CompanyUserId,
+        company_id: CompanyId,
         quiz_result: QuizResult,
     ) -> None:
         cache_data = {
             "participation_id": participation_id,
             "company_user_id": company_user_id,
+            "company_id": company_id,
             "quiz_id": quiz_id,
         }
 
         cache_data.update(asdict(quiz_result))
         cache_key = get_quiz_result_cache_key(participation_id)
+        member_key = get_member_key(company_id)
 
         ttl = 172800  # TTL in second(48 hours)
 
         await self.cache.set_cache(cache_key, cache_data, ttl)
+        await self.cache.set_member_key(member_key, cache_key)
