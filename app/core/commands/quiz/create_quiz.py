@@ -68,25 +68,7 @@ class CreateQuiz:
 
         await self.quiz_gateway.add(new_quiz)
 
-        for question in data.questions:
-            new_question = Question(
-                question_id=None,
-                quiz_id=new_quiz.quiz_id,
-                title=question.title,
-            )
-
-            await self.question_gateway.add(new_question)
-
-            answers = [
-                Answer(
-                    answer_id=None,
-                    question_id=new_question.question_id,
-                    text=answer.text,
-                    is_correct=answer.is_correct,
-                )
-                for answer in question.answers
-            ]
-            await self.answer_gateway.add_many(answers)
+        await self._add_questions_to_quiz(new_quiz.quiz_id, data.questions)
 
         await self.commiter.commit()
 
@@ -111,3 +93,26 @@ class CreateQuiz:
                 raise InvalidAnswerQuantityError()
             if not any(answer.is_correct for answer in question.answers):
                 raise InvalidAnswersValidateError()
+
+    async def _add_questions_to_quiz(
+        self, quiz_id: QuizId, questions: list[QuestionData]
+    ) -> None:
+        for question in questions:
+            new_question = Question(
+                question_id=None,
+                quiz_id=quiz_id,
+                title=question.title,
+            )
+
+            await self.question_gateway.add(new_question)
+
+            answers = [
+                Answer(
+                    answer_id=None,
+                    question_id=new_question.question_id,
+                    text=answer.text,
+                    is_correct=answer.is_correct,
+                )
+                for answer in question.answers
+            ]
+            await self.answer_gateway.add_many(answers)
