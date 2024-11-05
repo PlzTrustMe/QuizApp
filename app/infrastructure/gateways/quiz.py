@@ -1,4 +1,4 @@
-from sqlalchemy import Float, and_, cast, delete, func, select
+from sqlalchemy import Float, RowMapping, and_, cast, delete, func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -128,6 +128,44 @@ class SQLAlchemyQuizReader(QuizReader):
     def __init__(self, session: AsyncSession):
         self.session = session
 
+    def _load_models(self, rows: list[RowMapping]) -> list[QuizDetail]:
+        quizzes = {}
+        for row in rows:
+            quiz_id = row["quiz_id"]
+
+            if quiz_id not in quizzes:
+                quizzes[quiz_id] = QuizDetail(
+                    quiz_id=quiz_id,
+                    title=row["title"],
+                    description=row["description"],
+                    participation_count=row["participation_count"],
+                    questions=[],
+                )
+
+            question_id = row["question_id"]
+            quiz = quizzes[quiz_id]
+            question = next(
+                (q for q in quiz.questions if q.question_id == question_id),
+                None,
+            )
+
+            if not question:
+                question = QuestionDetail(
+                    question_id=question_id,
+                    title=row["question_title"],
+                    answers=[],
+                )
+                quiz.questions.append(question)
+
+            answer = AnswerDetail(
+                answer_id=row["answer_id"],
+                text=row["answer_text"],
+                is_correct=row["is_correct"],
+            )
+            question.answers.append(answer)
+
+        return list(quizzes.values())
+
     async def get_many(
         self, filters: QuizFilters, pagination: Pagination
     ) -> list[QuizDetail]:
@@ -174,42 +212,7 @@ class SQLAlchemyQuizReader(QuizReader):
         result = await self.session.execute(query)
         rows = result.mappings().all()
 
-        quizzes = {}
-        for row in rows:
-            quiz_id = row["quiz_id"]
-
-            if quiz_id not in quizzes:
-                quizzes[quiz_id] = QuizDetail(
-                    quiz_id=quiz_id,
-                    title=row["title"],
-                    description=row["description"],
-                    participation_count=row["participation_count"],
-                    questions=[],
-                )
-
-            question_id = row["question_id"]
-            quiz = quizzes[quiz_id]
-            question = next(
-                (q for q in quiz.questions if q.question_id == question_id),
-                None,
-            )
-
-            if not question:
-                question = QuestionDetail(
-                    question_id=question_id,
-                    title=row["question_title"],
-                    answers=[],
-                )
-                quiz.questions.append(question)
-
-            answer = AnswerDetail(
-                answer_id=row["answer_id"],
-                text=row["answer_text"],
-                is_correct=row["is_correct"],
-            )
-            question.answers.append(answer)
-
-        return list(quizzes.values())
+        return self._load_models(list(rows))
 
     async def total(self, filters: QuizFilters) -> int:
         query = select(func.count(quizzes_table.c.quiz_id))
