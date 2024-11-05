@@ -6,3 +6,7 @@ class CacheGateway(Protocol):
     @abstractmethod
     async def set_cache(self, key: str, value: dict, ttl: int) -> None:
         raise NotImplementedError
+
+    @abstractmethod
+    async def get_cache(self, key: str):
+        raise NotImplementedError

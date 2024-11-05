@@ -21,6 +21,7 @@ from app.core.interfaces.quiz_gateways import (
     QuizParticipationGateway,
     QuizResultGateway,
 )
+from app.utils.get_cache_key import get_quiz_result_cache_key
 
 
 @dataclass(frozen=True)
@@ -71,21 +72,29 @@ class SaveQuizResult:
         await self.commiter.commit()
 
         await self._set_cache(
-            quiz.quiz_id, company_user.company_user_id, new_quiz_result
+            quiz_participation.quiz_participation_id,
+            quiz.quiz_id,
+            company_user.company_user_id,
+            new_quiz_result,
         )
 
         return new_quiz_result.quiz_result_id
 
     async def _set_cache(
         self,
+        participation_id: QuizParticipationId,
         quiz_id: QuizId,
         company_user_id: CompanyUserId,
         quiz_result: QuizResult,
     ) -> None:
-        cache_data = {"quiz_id": quiz_id, "company_user_id": company_user_id}
+        cache_data = {
+            "participation_id": participation_id,
+            "company_user_id": company_user_id,
+            "quiz_id": quiz_id,
+        }
 
         cache_data.update(asdict(quiz_result))
-        cache_key = f"quiz_result:{quiz_id}:{company_user_id}"
+        cache_key = get_quiz_result_cache_key(participation_id)
 
         ttl = 172800  # TTL in second(48 hours)
 
