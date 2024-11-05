@@ -37,6 +37,7 @@ from app.core.commands.invitation.send_request_from_user import (
 from app.core.commands.quiz.create_quiz import CreateQuiz
 from app.core.commands.quiz.delete_quiz import DeleteQuiz
 from app.core.commands.quiz.edit_quiz_title import EditQuizTitle
+from app.core.commands.quiz.export_quiz_result import ExportQuizResult
 from app.core.commands.quiz.save_quiz_result import SaveQuizResult
 from app.core.commands.quiz.take_quiz import TakeQuiz
 from app.core.commands.user.delete_user import DeleteUser
@@ -81,7 +82,7 @@ from app.core.queries.quiz.get_all_company_quiz_result import (
     GetAllCompanyQuizResult,
 )
 from app.core.queries.quiz.get_all_quiz_average import GetAllQuizAverage
-from app.core.queries.quiz.get_quiz_result import GetMyQuizResult
+from app.core.queries.quiz.get_quiz_result import GetQuizResult
 from app.core.queries.quiz.get_quizzes import GetAllQuizzes
 from app.core.queries.user.get_me import GetMe
 from app.core.queries.user.get_user import GetUserById
@@ -257,8 +258,9 @@ def interactor_provider() -> Provider:
         SaveQuizResult,
         TakeQuiz,
         GetAllQuizAverage,
-        GetMyQuizResult,
+        GetQuizResult,
         GetAllCompanyQuizResult,
+        ExportQuizResult,
         scope=Scope.REQUEST,
     )
 

@@ -23,17 +23,17 @@ from app.utils.get_cache_key import get_quiz_result_cache_key
 
 
 @dataclass(frozen=True)
-class GetMyQuizResultInputData:
+class GetQuizResultInputData:
     participation_id: int
 
 
 @dataclass(frozen=True)
-class GetMyQuizResultOutputData:
+class GetQuizResultOutputData:
     correct_answers: int | None
 
 
 @dataclass
-class GetMyQuizResult:
+class GetQuizResult:
     id_provider: IdProvider
     access_service: AccessService
     quiz_participation_gateway: QuizParticipationGateway
@@ -42,8 +42,8 @@ class GetMyQuizResult:
     cache: CacheGateway
 
     async def by_user(
-        self, data: GetMyQuizResultInputData
-    ) -> GetMyQuizResultOutputData:
+        self, data: GetQuizResultInputData
+    ) -> GetQuizResultOutputData:
         participation_id = QuizParticipationId(data.participation_id)
 
         participation = await self.quiz_participation_gateway.by_id(
@@ -66,8 +66,8 @@ class GetMyQuizResult:
         return await self._get_data(participation_id)
 
     async def by_company(
-        self, data: GetMyQuizResultInputData
-    ) -> GetMyQuizResultOutputData:
+        self, data: GetQuizResultInputData
+    ) -> GetQuizResultOutputData:
         participation_id = QuizParticipationId(data.participation_id)
 
         participation = await self.quiz_participation_gateway.by_id(
@@ -92,15 +92,15 @@ class GetMyQuizResult:
 
     async def _get_data(
         self, participation_id: QuizParticipationId
-    ) -> GetMyQuizResultOutputData:
+    ) -> GetQuizResultOutputData:
         cache_key = get_quiz_result_cache_key(participation_id)
 
         cache_data = await self.cache.get_cache(cache_key)
 
         return (
-            GetMyQuizResultOutputData(correct_answers=None)
+            GetQuizResultOutputData(correct_answers=None)
             if not cache_data
-            else GetMyQuizResultOutputData(
+            else GetQuizResultOutputData(
                 correct_answers=cache_data["correct_answers"]
             )
         )

@@ -1,8 +1,10 @@
+import os.path
 from typing import Annotated
 
 from dishka import FromDishka
 from dishka.integrations.fastapi import DishkaRoute
 from fastapi import APIRouter, Query, status
+from fastapi.responses import FileResponse
 
 from app.core.commands.quiz.create_quiz import (
     AnswerData,
@@ -14,6 +16,11 @@ from app.core.commands.quiz.delete_quiz import DeleteQuiz, DeleteQuizInputData
 from app.core.commands.quiz.edit_quiz_title import (
     EditQuizTitle,
     EditQuizTitleInputData,
+)
+from app.core.commands.quiz.export_quiz_result import (
+    ExportFormat,
+    ExportQuizResult,
+    ExportQuizResultInputData,
 )
 from app.core.commands.quiz.save_quiz_result import (
     SaveQuizResult,
@@ -33,9 +40,9 @@ from app.core.queries.quiz.get_all_quiz_average import (
     GetAllQuizAverageOutputData,
 )
 from app.core.queries.quiz.get_quiz_result import (
-    GetMyQuizResult,
-    GetMyQuizResultInputData,
-    GetMyQuizResultOutputData,
+    GetQuizResult,
+    GetQuizResultInputData,
+    GetQuizResultOutputData,
 )
 from app.core.queries.quiz.get_quizzes import (
     GetAllQuizzes,
@@ -58,6 +65,25 @@ quiz_router = APIRouter(
 )
 
 
+@quiz_router.get("/export/{participation_id}")
+async def export_quiz_result(
+    participation_id: int,
+    action: FromDishka[ExportQuizResult],
+    export_format: ExportFormat | None = None,
+):
+    output_data = await action(
+        ExportQuizResultInputData(
+            format=export_format, participation_id=participation_id
+        )
+    )
+
+    return FileResponse(
+        output_data.file_path,
+        media_type=output_data.media_type,
+        filename=os.path.basename(output_data.file_path),  # noqa: PTH119
+    )
+
+
 @quiz_router.get("/average", status_code=status.HTTP_200_OK)
 async def get_all_quizzes_average(
     action: FromDishka[GetAllQuizAverage],
@@ -69,10 +95,10 @@ async def get_all_quizzes_average(
 
 @quiz_router.get("/my/{participation_id}", status_code=status.HTTP_200_OK)
 async def get_my_quiz_result(
-    participation_id: int, action: FromDishka[GetMyQuizResult]
-) -> OkResponse[GetMyQuizResultOutputData]:
+    participation_id: int, action: FromDishka[GetQuizResult]
+) -> OkResponse[GetQuizResultOutputData]:
     output_data = await action.by_user(
-        GetMyQuizResultInputData(participation_id)
+        GetQuizResultInputData(participation_id)
     )
 
     return OkResponse(result=output_data)
@@ -80,10 +106,10 @@ async def get_my_quiz_result(
 
 @quiz_router.get("/company/{participation_id}", status_code=status.HTTP_200_OK)
 async def get_company_user_quiz_result(
-    participation_id: int, action: FromDishka[GetMyQuizResult]
-) -> OkResponse[GetMyQuizResultOutputData]:
+    participation_id: int, action: FromDishka[GetQuizResult]
+) -> OkResponse[GetQuizResultOutputData]:
     output_data = await action.by_company(
-        GetMyQuizResultInputData(participation_id)
+        GetQuizResultInputData(participation_id)
     )
 
     return OkResponse(result=output_data)
