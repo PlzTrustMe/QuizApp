@@ -33,13 +33,15 @@ class EditMemberRole:
         user_id = UserId(data.user_id)
         company_id = CompanyId(data.company_id)
 
-        member = await self.company_user_gateway.by_identity(user_id)
-        if not member:
-            raise CompanyUserNotFoundError()
-
         company = await self.company_gateway.by_id(company_id)
         if not company:
             raise CompanyNotFoundError(company_id)
+
+        member = await self.company_user_gateway.by_identity(
+            company_id, user_id
+        )
+        if not member:
+            raise CompanyUserNotFoundError()
 
         await self.access_service.ensure_can_edit_member_role(company)
 

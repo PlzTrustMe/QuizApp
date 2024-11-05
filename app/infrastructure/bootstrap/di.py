@@ -34,6 +34,9 @@ from app.core.commands.invitation.send_invitation_to_user import (
 from app.core.commands.invitation.send_request_from_user import (
     SendRequestFromUser,
 )
+from app.core.commands.quiz.create_quiz import CreateQuiz
+from app.core.commands.quiz.delete_quiz import DeleteQuiz
+from app.core.commands.quiz.edit_quiz_title import EditQuizTitle
 from app.core.commands.user.delete_user import DeleteUser
 from app.core.commands.user.edit_full_name import EditFullName
 from app.core.commands.user.edit_password import EditPassword
@@ -56,12 +59,19 @@ from app.core.interfaces.invitation_gateways import (
     UserRequestReader,
 )
 from app.core.interfaces.password_hasher import PasswordHasher
+from app.core.interfaces.quiz_gateways import (
+    AnswerGateway,
+    QuestionGateway,
+    QuizGateway,
+    QuizReader,
+)
 from app.core.interfaces.user_gateways import UserGateway, UserReader
 from app.core.queries.company.get_company_by_id import GetCompanyById
 from app.core.queries.company.get_company_users import GetCompanyUsers
 from app.core.queries.company.get_many_companies import GetManyCompanies
 from app.core.queries.invitation.get_invitations import GetInvitations
 from app.core.queries.invitation.get_user_requests import GetUserRequests
+from app.core.queries.quiz.get_quizzes import GetAllQuizzes
 from app.core.queries.user.get_me import GetMe
 from app.core.queries.user.get_user import GetUserById
 from app.core.queries.user.get_users import GetUsers
@@ -82,6 +92,12 @@ from app.infrastructure.gateways.invite import (
     SQLAlchemyInvitationReader,
     SQLAlchemyUserRequestReader,
     UserRequestMapper,
+)
+from app.infrastructure.gateways.quiz import (
+    AnswerMapper,
+    QuestionMapper,
+    QuizMapper,
+    SQLAlchemyQuizReader,
 )
 from app.infrastructure.gateways.user import SQLAlchemyUserReader, UserMapper
 from app.infrastructure.jwt.config import Auth0Config, JWTConfig
@@ -141,6 +157,16 @@ def gateway_provider() -> Provider:
         provides=UserRequestReader,
     )
 
+    provider.provide(QuizMapper, scope=Scope.REQUEST, provides=QuizGateway)
+    provider.provide(
+        QuestionMapper, scope=Scope.REQUEST, provides=QuestionGateway
+    )
+    provider.provide(AnswerMapper, scope=Scope.REQUEST, provides=AnswerGateway)
+
+    provider.provide(
+        SQLAlchemyQuizReader, scope=Scope.REQUEST, provides=QuizReader
+    )
+
     provider.provide(
         SACommiter,
         scope=Scope.REQUEST,
@@ -195,6 +221,14 @@ def interactor_provider() -> Provider:
         GetInvitations,
         GetUserRequests,
         GetCompanyUsers,
+        scope=Scope.REQUEST,
+    )
+
+    provider.provide_all(
+        CreateQuiz,
+        DeleteQuiz,
+        EditQuizTitle,
+        GetAllQuizzes,
         scope=Scope.REQUEST,
     )
 

@@ -17,6 +17,12 @@ from app.core.commands.invitation.errors import (
     UserRequestAlreadyExistError,
     UserRequestNotFoundError,
 )
+from app.core.commands.quiz.errors import (
+    InvalidAnswerQuantityError,
+    InvalidAnswersValidateError,
+    InvalidQuestionQuantityError,
+    QuizNotFoundError,
+)
 from app.core.commands.user.errors import (
     AccessDeniedError,
     AccessTokenIsExpiredError,
@@ -65,6 +71,21 @@ def setup_exception_handlers(app: FastAPI) -> None:
     )
     app.add_exception_handler(
         WeakPasswordError, error_handler(status.HTTP_422_UNPROCESSABLE_ENTITY)
+    )
+    app.add_exception_handler(
+        InvalidQuestionQuantityError,
+        error_handler(status.HTTP_422_UNPROCESSABLE_ENTITY),
+    )
+    app.add_exception_handler(
+        InvalidAnswerQuantityError,
+        error_handler(status.HTTP_422_UNPROCESSABLE_ENTITY),
+    )
+    app.add_exception_handler(
+        InvalidAnswersValidateError,
+        error_handler(status.HTTP_422_UNPROCESSABLE_ENTITY),
+    )
+    app.add_exception_handler(
+        QuizNotFoundError, error_handler(status.HTTP_404_NOT_FOUND)
     )
     app.add_exception_handler(
         UserNotFoundError, error_handler(status.HTTP_404_NOT_FOUND)

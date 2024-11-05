@@ -12,6 +12,11 @@ from tests.mocks.invitation_gateways import (
     FakeInvitationMapper,
     FakeUserRequestMapper,
 )
+from tests.mocks.quiz_gateways import (
+    FakeAnswerMapper,
+    FakeQuestionMapper,
+    FakeQuizMapper,
+)
 from tests.mocks.user_gateways import FakeUserMapper
 
 
@@ -50,3 +55,18 @@ def invitation_gateway() -> FakeInvitationMapper:
 @pytest.fixture
 def user_request_gateway() -> FakeUserRequestMapper:
     return FakeUserRequestMapper()
+
+
+@pytest.fixture
+def quiz_gateway() -> FakeQuizMapper:
+    return FakeQuizMapper()
+
+
+@pytest.fixture
+def question_gateway() -> FakeQuestionMapper:
+    return FakeQuestionMapper()
+
+
+@pytest.fixture
+def answer_gateway() -> FakeAnswerMapper:
+    return FakeAnswerMapper()

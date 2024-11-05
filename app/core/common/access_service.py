@@ -1,6 +1,7 @@
+from app.core.commands.company.errors import CompanyUserNotFoundError
 from app.core.commands.invitation.errors import CompanyUserAlreadyExistError
 from app.core.commands.user.errors import AccessDeniedError
-from app.core.entities.company import Company, CompanyId
+from app.core.entities.company import Company, CompanyId, CompanyRole
 from app.core.entities.invitation import Invitation, UserRequest
 from app.core.entities.user import User, UserId
 from app.core.interfaces.company_gateways import CompanyUserGateway
@@ -26,11 +27,28 @@ class AccessService:
         if company.owner_id != actor.user_id:
             raise AccessDeniedError()
 
+    async def _is_admin(self, company: Company):
+        actor = await self.id_provider.get_user()
+        company_user = await self.company_user_gateway.by_identity(
+            company.company_id, actor.user_id
+        )
+        if not company_user:
+            raise CompanyUserNotFoundError()
+
+        if company_user.role != CompanyRole.ADMIN:
+            raise AccessDeniedError()
+
     async def _is_not_company_member(
         self, company_id: CompanyId, user_id: UserId
     ):
         if await self.company_user_gateway.is_exist(company_id, user_id):
             raise CompanyUserAlreadyExistError(company_id, user_id)
+
+    async def _is_owner_or_admin(self, company: Company):
+        try:
+            await self._is_owner(company)
+        except AccessDeniedError:
+            await self._is_admin(company)
 
     async def ensure_can_edit_full_name(self, record_to_edit: User):
         await self._is_identity(record_to_edit.user_id)
@@ -86,3 +104,12 @@ class AccessService:
 
     async def ensure_can_edit_member_role(self, company: Company):
         await self._is_owner(company)
+
+    async def ensure_can_create_quiz(self, company: Company):
+        await self._is_owner_or_admin(company)
+
+    async def ensure_can_edit_quiz(self, company: Company):
+        await self._is_owner_or_admin(company)
+
+    async def ensure_can_delete_quiz(self, company: Company):
+        await self._is_owner_or_admin(company)
