@@ -16,6 +16,8 @@ from tests.mocks.quiz_gateways import (
     FakeAnswerMapper,
     FakeQuestionMapper,
     FakeQuizMapper,
+    FakeQuizParticipationMapper,
+    FakeQuizResultMapper,
 )
 from tests.mocks.user_gateways import FakeUserMapper
 
@@ -70,3 +72,13 @@ def question_gateway() -> FakeQuestionMapper:
 @pytest.fixture
 def answer_gateway() -> FakeAnswerMapper:
     return FakeAnswerMapper()
+
+
+@pytest.fixture
+def participation_gateway() -> FakeQuizParticipationMapper:
+    return FakeQuizParticipationMapper()
+
+
+@pytest.fixture
+def quiz_result_gateway() -> FakeQuizResultMapper:
+    return FakeQuizResultMapper()

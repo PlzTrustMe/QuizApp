@@ -37,7 +37,7 @@ class EditMemberRole:
         if not company:
             raise CompanyNotFoundError(company_id)
 
-        member = await self.company_user_gateway.by_identity(
+        member = await self.company_user_gateway.by_company(
             company_id, user_id
         )
         if not member:

@@ -1,11 +1,13 @@
 from dataclasses import dataclass
 from typing import NewType
 
-from app.core.entities.company import CompanyId
+from app.core.entities.company import CompanyId, CompanyUserId
 
 QuizId = NewType("QuizId", int)
 QuestionId = NewType("QuestionId", int)
 AnswerId = NewType("AnswerId", int)
+QuizParticipationId = NewType("QuizParticipationId", int)
+QuizResultId = NewType("QuizResultId", int)
 
 
 @dataclass
@@ -30,3 +32,17 @@ class Answer:
     question_id: QuestionId
     text: str
     is_correct: bool = False
+
+
+@dataclass
+class QuizParticipation:
+    quiz_participation_id: QuizParticipationId | None
+    quiz_id: QuizId
+    company_user_id: CompanyUserId
+
+
+@dataclass
+class QuizResult:
+    quiz_result_id: QuizResultId | None
+    quiz_participation_id: QuizParticipationId
+    correct_answers: int

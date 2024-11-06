@@ -34,3 +34,12 @@ class QuizNotFoundError(ApplicationError):
     @property
     def message(self) -> str:
         return f"Quiz with id {self.quiz_id} not found"
+
+
+@dataclass(eq=False)
+class QuizParticipationNotFoundError(ApplicationError):
+    participation_id: int
+
+    @property
+    def message(self) -> str:
+        return f"Quiz participation with id {self.participation_id} not found"

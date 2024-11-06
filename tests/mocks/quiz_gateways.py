@@ -1,4 +1,4 @@
-from app.core.entities.company import CompanyId
+from app.core.entities.company import CompanyId, CompanyUserId
 from app.core.entities.quiz import (
     Answer,
     AnswerId,
@@ -6,11 +6,17 @@ from app.core.entities.quiz import (
     QuestionId,
     Quiz,
     QuizId,
+    QuizParticipation,
+    QuizParticipationId,
+    QuizResult,
+    QuizResultId,
 )
 from app.core.interfaces.quiz_gateways import (
     AnswerGateway,
     QuestionGateway,
     QuizGateway,
+    QuizParticipationGateway,
+    QuizResultGateway,
 )
 
 
@@ -93,4 +99,45 @@ class FakeAnswerMapper(AnswerGateway):
     async def add_many(self, answers: list[Answer]) -> None:
         self.answers.extend(answers)
 
+        self.saved = True
+
+
+class FakeQuizParticipationMapper(QuizParticipationGateway):
+    def __init__(self):
+        self.quiz_participation = QuizParticipation(
+            quiz_participation_id=QuizParticipationId(1),
+            quiz_id=QuizId(1),
+            company_user_id=CompanyUserId(1),
+        )
+
+        self.saved = False
+
+    async def add(self, participation: QuizParticipation) -> None:
+        self.quiz_participation.quiz_id = participation.quiz_id
+        self.quiz_participation.company_user_id = participation.company_user_id
+
+        self.saved = True
+
+    async def by_id(
+        self, quiz_participation_id: QuizParticipationId
+    ) -> QuizParticipation | None:
+        if (
+            self.quiz_participation.quiz_participation_id
+            == quiz_participation_id
+        ):
+            return self.quiz_participation
+        return None
+
+
+class FakeQuizResultMapper(QuizResultGateway):
+    def __init__(self):
+        self.quiz_result = QuizResult(
+            quiz_result_id=QuizResultId(1),
+            quiz_participation_id=QuizParticipationId(1),
+            correct_answers=2,
+        )
+
+        self.saved = False
+
+    async def add(self, quiz_result: QuizResult) -> None:
         self.saved = True

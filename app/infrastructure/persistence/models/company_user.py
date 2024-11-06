@@ -50,5 +50,10 @@ def map_company_users_table() -> None:
         properties={
             "user": relationship("User", back_populates="company_user"),
             "company": relationship("Company", back_populates="company_user"),
+            "quiz_participation": relationship(
+                "QuizParticipation",
+                back_populates="company_user",
+                cascade="all, delete-orphan",
+            ),
         },
     )

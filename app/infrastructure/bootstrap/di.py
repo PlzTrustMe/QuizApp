@@ -37,6 +37,8 @@ from app.core.commands.invitation.send_request_from_user import (
 from app.core.commands.quiz.create_quiz import CreateQuiz
 from app.core.commands.quiz.delete_quiz import DeleteQuiz
 from app.core.commands.quiz.edit_quiz_title import EditQuizTitle
+from app.core.commands.quiz.save_quiz_result import SaveQuizResult
+from app.core.commands.quiz.take_quiz import TakeQuiz
 from app.core.commands.user.delete_user import DeleteUser
 from app.core.commands.user.edit_full_name import EditFullName
 from app.core.commands.user.edit_password import EditPassword
@@ -63,14 +65,18 @@ from app.core.interfaces.quiz_gateways import (
     AnswerGateway,
     QuestionGateway,
     QuizGateway,
+    QuizParticipationGateway,
     QuizReader,
+    QuizResultGateway,
 )
 from app.core.interfaces.user_gateways import UserGateway, UserReader
 from app.core.queries.company.get_company_by_id import GetCompanyById
+from app.core.queries.company.get_company_user import GetCompanyUser
 from app.core.queries.company.get_company_users import GetCompanyUsers
 from app.core.queries.company.get_many_companies import GetManyCompanies
 from app.core.queries.invitation.get_invitations import GetInvitations
 from app.core.queries.invitation.get_user_requests import GetUserRequests
+from app.core.queries.quiz.get_all_quiz_result import GetAllQuizResult
 from app.core.queries.quiz.get_quizzes import GetAllQuizzes
 from app.core.queries.user.get_me import GetMe
 from app.core.queries.user.get_user import GetUserById
@@ -97,6 +103,8 @@ from app.infrastructure.gateways.quiz import (
     AnswerMapper,
     QuestionMapper,
     QuizMapper,
+    QuizParticipationMapper,
+    QuizResultMapper,
     SQLAlchemyQuizReader,
 )
 from app.infrastructure.gateways.user import SQLAlchemyUserReader, UserMapper
@@ -168,6 +176,16 @@ def gateway_provider() -> Provider:
     )
 
     provider.provide(
+        QuizResultMapper, scope=Scope.REQUEST, provides=QuizResultGateway
+    )
+
+    provider.provide(
+        QuizParticipationMapper,
+        scope=Scope.REQUEST,
+        provides=QuizParticipationGateway,
+    )
+
+    provider.provide(
         SACommiter,
         scope=Scope.REQUEST,
         provides=Commiter,
@@ -202,6 +220,8 @@ def interactor_provider() -> Provider:
         CreateCompany,
         GetCompanyById,
         GetManyCompanies,
+        GetCompanyUsers,
+        GetCompanyUser,
         DeleteCompany,
         EditCompanyDescription,
         EditCompanyName,
@@ -220,7 +240,6 @@ def interactor_provider() -> Provider:
         AcceptInvitation,
         GetInvitations,
         GetUserRequests,
-        GetCompanyUsers,
         scope=Scope.REQUEST,
     )
 
@@ -229,6 +248,9 @@ def interactor_provider() -> Provider:
         DeleteQuiz,
         EditQuizTitle,
         GetAllQuizzes,
+        SaveQuizResult,
+        TakeQuiz,
+        GetAllQuizResult,
         scope=Scope.REQUEST,
     )
 
