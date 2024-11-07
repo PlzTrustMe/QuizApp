@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from sqlalchemy import Float, RowMapping, and_, cast, delete, func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -14,6 +16,7 @@ from app.core.entities.quiz import (
     QuizParticipationId,
     QuizResult,
 )
+from app.core.entities.user import UserId
 from app.core.interfaces.quiz_gateways import (
     AnswerDetail,
     AnswerGateway,
@@ -25,6 +28,9 @@ from app.core.interfaces.quiz_gateways import (
     QuizParticipationGateway,
     QuizReader,
     QuizResultGateway,
+)
+from app.infrastructure.persistence.models.company_user import (
+    company_users_table,
 )
 from app.infrastructure.persistence.models.quiz import (
     answers_table,
@@ -305,3 +311,28 @@ class SQLAlchemyQuizReader(QuizReader):
         average_score_percentage = result.scalar()
 
         return average_score_percentage
+
+    async def get_overall_rating(self, user_id: UserId) -> Decimal:
+        query = (
+            select(
+                func.avg(quiz_results_table.c.correct_answers).label(
+                    "overall_rating"
+                )
+            )
+            .select_from(
+                quiz_results_table.join(
+                    quiz_participations_table,
+                    quiz_results_table.c.quiz_participation_id
+                    == quiz_participations_table.c.quiz_participation_id,
+                ).join(
+                    company_users_table,
+                    quiz_participations_table.c.company_user_id
+                    == company_users_table.c.company_user_id,
+                )
+            )
+            .where(company_users_table.c.user_id == user_id)
+        )
+
+        result = await self.session.execute(query)
+
+        return result.scalar() if result else Decimal(0)

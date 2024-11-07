@@ -39,6 +39,10 @@ from app.core.queries.quiz.get_all_quiz_average import (
     GetAllQuizAverage,
     GetAllQuizAverageOutputData,
 )
+from app.core.queries.quiz.get_my_overall_rating import (
+    GetMyOverallRating,
+    GetMyOverallRatingOutputData,
+)
 from app.core.queries.quiz.get_quiz_result import (
     GetQuizResult,
     GetQuizResultInputData,
@@ -88,6 +92,15 @@ async def export_quiz_result(
 async def get_all_quizzes_average(
     action: FromDishka[GetAllQuizAverage],
 ) -> OkResponse[GetAllQuizAverageOutputData]:
+    output_data = await action()
+
+    return OkResponse(result=output_data)
+
+
+@quiz_router.get("/my/overall-rating", status_code=status.HTTP_200_OK)
+async def get_my_overall_rating(
+    action: FromDishka[GetMyOverallRating],
+) -> OkResponse[GetMyOverallRatingOutputData]:
     output_data = await action()
 
     return OkResponse(result=output_data)

@@ -82,6 +82,7 @@ from app.core.queries.quiz.get_all_company_quiz_result import (
     GetAllCompanyQuizResult,
 )
 from app.core.queries.quiz.get_all_quiz_average import GetAllQuizAverage
+from app.core.queries.quiz.get_my_overall_rating import GetMyOverallRating
 from app.core.queries.quiz.get_quiz_result import GetQuizResult
 from app.core.queries.quiz.get_quizzes import GetAllQuizzes
 from app.core.queries.user.get_me import GetMe
@@ -261,6 +262,7 @@ def interactor_provider() -> Provider:
         GetQuizResult,
         GetAllCompanyQuizResult,
         ExportQuizResult,
+        GetMyOverallRating,
         scope=Scope.REQUEST,
     )
 

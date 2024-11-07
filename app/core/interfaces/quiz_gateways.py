@@ -13,6 +13,7 @@ from app.core.entities.quiz import (
     QuizParticipationId,
     QuizResult,
 )
+from app.core.entities.user import UserId
 
 
 class QuizGateway(Protocol):
@@ -106,4 +107,8 @@ class QuizReader(Protocol):
 
     @abstractmethod
     async def total_average(self) -> float:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def get_overall_rating(self, user_id: UserId) -> int:
         raise NotImplementedError
