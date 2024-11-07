@@ -115,6 +115,12 @@ class TimeRange(str, Enum):
     WEEK = "week"
 
 
+@dataclass(frozen=True)
+class UserLastAttempt:
+    user_id: int
+    last_attempt: datetime
+
+
 class QuizReader(Protocol):
     @abstractmethod
     async def get_many(
@@ -162,4 +168,10 @@ class QuizReader(Protocol):
     async def get_company_user_quiz_average_scores(
         self, company_user_id: CompanyUserId, time_range: TimeRange
     ) -> list[AverageScore]:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def get_company_users_last_attempt(
+        self, company_id: CompanyId
+    ) -> list[UserLastAttempt]:
         raise NotImplementedError

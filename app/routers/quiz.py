@@ -55,6 +55,11 @@ from app.core.queries.quiz.get_company_user_quiz_average import (
     GetCompanyUserQuizAverageInputData,
     GetCompanyUserQuizAverageOutputData,
 )
+from app.core.queries.quiz.get_company_users_last_attempt import (
+    GetCompanyUserLastAttempt,
+    GetCompanyUserLastAttemptInputData,
+    GetCompanyUserLastAttemptOutputData,
+)
 from app.core.queries.quiz.get_my_overall_rating import (
     GetMyOverallRating,
     GetMyOverallRatingOutputData,
@@ -144,6 +149,17 @@ async def get_company_user_quiz_average(
     output_data = await action(
         GetCompanyUserQuizAverageInputData(company_user_id, time_range)
     )
+
+    return OkResponse(result=output_data)
+
+
+@quiz_router.get(
+    "/company-user-last-attempt/{company_id}", status_code=status.HTTP_200_OK
+)
+async def get_company_users_last_attempt(
+    company_id: int, action: FromDishka[GetCompanyUserLastAttempt]
+) -> OkResponse[GetCompanyUserLastAttemptOutputData]:
+    output_data = await action(GetCompanyUserLastAttemptInputData(company_id))
 
     return OkResponse(result=output_data)
 

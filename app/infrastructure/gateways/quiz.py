@@ -42,6 +42,7 @@ from app.core.interfaces.quiz_gateways import (
     QuizReader,
     QuizResultGateway,
     TimeRange,
+    UserLastAttempt,
 )
 from app.infrastructure.persistence.models.company_user import (
     company_users_table,
@@ -495,5 +496,38 @@ class SQLAlchemyQuizReader(QuizReader):
 
         return [
             AverageScore(start_date=row.time_range, average=row.average_score)
+            for row in rows
+        ]
+
+    async def get_company_users_last_attempt(
+        self, company_id: CompanyId
+    ) -> list[UserLastAttempt]:
+        query = (
+            select(
+                company_users_table.c.user_id,
+                func.max(quiz_participations_table.c.created_at).label(
+                    "last_attempt"
+                ),
+            )
+            .select_from(
+                quiz_participations_table.join(
+                    company_users_table,
+                    quiz_participations_table.c.company_user_id
+                    == company_users_table.c.company_user_id,
+                ).join(
+                    quizzes_table,
+                    quiz_participations_table.c.quiz_id
+                    == quizzes_table.c.quiz_id,
+                )
+            )
+            .where(quizzes_table.c.company_id == company_id)
+            .group_by(company_users_table.c.user_id)
+        )
+
+        result = await self.session.execute(query)
+        rows = result.fetchall()
+
+        return [
+            UserLastAttempt(user_id=row.user_id, last_attempt=row.last_attempt)
             for row in rows
         ]
