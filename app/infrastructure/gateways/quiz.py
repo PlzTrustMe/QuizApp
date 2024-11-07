@@ -30,6 +30,7 @@ from app.core.entities.user import UserId
 from app.core.interfaces.quiz_gateways import (
     AnswerDetail,
     AnswerGateway,
+    CompanyAverageScore,
     LastQuizCompletionTimes,
     QuestionDetail,
     QuestionGateway,
@@ -40,6 +41,7 @@ from app.core.interfaces.quiz_gateways import (
     QuizParticipationGateway,
     QuizReader,
     QuizResultGateway,
+    TimeRange,
 )
 from app.infrastructure.persistence.models.company_user import (
     company_users_table,
@@ -419,6 +421,44 @@ class SQLAlchemyQuizReader(QuizReader):
         return [
             LastQuizCompletionTimes(
                 quiz_id=row.quiz_id, completion_data=row.last_completed
+            )
+            for row in rows
+        ]
+
+    async def get_company_average_scores_over_time(
+        self, company_id: int, time_range: TimeRange
+    ) -> list[CompanyAverageScore]:
+        query = (
+            select(
+                func.date_trunc(
+                    time_range, quiz_participations_table.c.created_at
+                ).label("time_range"),
+                func.avg(quiz_results_table.c.correct_answers).label(
+                    "average_score"
+                ),
+            )
+            .select_from(
+                quiz_results_table.join(
+                    quiz_participations_table,
+                    quiz_results_table.c.quiz_participation_id
+                    == quiz_participations_table.c.quiz_participation_id,
+                ).join(
+                    quizzes_table,
+                    quiz_participations_table.c.quiz_id
+                    == quizzes_table.c.quiz_id,
+                )
+            )
+            .where(quizzes_table.c.company_id == company_id)
+            .group_by("time_range")
+            .order_by("time_range")
+        )
+
+        result = await self.session.execute(query)
+        rows = result.fetchall()
+
+        return [
+            CompanyAverageScore(
+                start_date=row.time_range, average=row.average_score
             )
             for row in rows
         ]

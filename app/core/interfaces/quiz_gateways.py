@@ -2,6 +2,8 @@ from abc import abstractmethod
 from asyncio import Protocol
 from dataclasses import dataclass
 from datetime import datetime
+from decimal import Decimal
+from enum import Enum
 
 from app.core.common.pagination import Pagination
 from app.core.entities.company import CompanyId, CompanyUserId
@@ -101,6 +103,18 @@ class LastQuizCompletionTimes:
     completion_data: datetime
 
 
+@dataclass(frozen=True)
+class CompanyAverageScore:
+    start_date: datetime
+    average: Decimal
+
+
+class TimeRange(str, Enum):
+    YEAR = "year"
+    MONTH = "month"
+    WEEK = "week"
+
+
 class QuizReader(Protocol):
     @abstractmethod
     async def get_many(
@@ -136,4 +150,10 @@ class QuizReader(Protocol):
     async def get_all_last_quiz_completion_times(
         self, user_id: UserId
     ) -> list[LastQuizCompletionTimes]:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def get_company_average_scores_over_time(
+        self, company_id: CompanyId, time_range: TimeRange
+    ) -> list[CompanyAverageScore]:
         raise NotImplementedError
