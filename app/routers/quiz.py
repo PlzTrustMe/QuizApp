@@ -36,6 +36,10 @@ from app.core.queries.quiz.get_all_company_quiz_result import (
     GetAllCompanyQuizResultInputData,
     GetAllCompanyQuizResultOutputData,
 )
+from app.core.queries.quiz.get_all_last_quiz_completion_times import (
+    GetLastCompletionTimes,
+    GetLastCompletionTimesOutputData,
+)
 from app.core.queries.quiz.get_all_quiz_average import (
     GetAllQuizAverage,
     GetAllQuizAverageInputData,
@@ -92,6 +96,15 @@ async def export_quiz_result(
         media_type=output_data.media_type,
         filename=os.path.basename(output_data.file_path),  # noqa: PTH119
     )
+
+
+@quiz_router.get("/last-completion")
+async def get_all_last_quiz_completion_times(
+    action: FromDishka[GetLastCompletionTimes],
+) -> OkResponse[GetLastCompletionTimesOutputData]:
+    output_data = await action()
+
+    return OkResponse(result=output_data)
 
 
 @quiz_router.get("/average", status_code=status.HTTP_200_OK)

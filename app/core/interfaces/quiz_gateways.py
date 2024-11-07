@@ -95,6 +95,12 @@ class QuizAverage:
     average: float
 
 
+@dataclass(frozen=True)
+class LastQuizCompletionTimes:
+    quiz_id: int
+    completion_data: datetime
+
+
 class QuizReader(Protocol):
     @abstractmethod
     async def get_many(
@@ -124,4 +130,10 @@ class QuizReader(Protocol):
     async def get_user_quiz_averages(
         self, user_id: UserId, start_data: datetime, end_data: datetime
     ) -> list[QuizAverage]:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def get_all_last_quiz_completion_times(
+        self, user_id: UserId
+    ) -> list[LastQuizCompletionTimes]:
         raise NotImplementedError

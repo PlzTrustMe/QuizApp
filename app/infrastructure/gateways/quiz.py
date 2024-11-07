@@ -30,6 +30,7 @@ from app.core.entities.user import UserId
 from app.core.interfaces.quiz_gateways import (
     AnswerDetail,
     AnswerGateway,
+    LastQuizCompletionTimes,
     QuestionDetail,
     QuestionGateway,
     QuizAverage,
@@ -388,5 +389,36 @@ class SQLAlchemyQuizReader(QuizReader):
 
         return [
             QuizAverage(quiz_id=row.quiz_id, average=float(row.average_score))
+            for row in rows
+        ]
+
+    async def get_all_last_quiz_completion_times(
+        self, user_id: UserId
+    ) -> list[LastQuizCompletionTimes]:
+        query = (
+            select(
+                quiz_participations_table.c.quiz_id,
+                func.max(quiz_participations_table.c.created_at).label(
+                    "last_completed"
+                ),
+            )
+            .select_from(
+                quiz_participations_table.join(
+                    company_users_table,
+                    quiz_participations_table.c.company_user_id
+                    == company_users_table.c.company_user_id,
+                )
+            )
+            .where(company_users_table.c.user_id == user_id)
+            .group_by(quiz_participations_table.c.quiz_id)
+        )
+
+        result = await self.session.execute(query)
+        rows = result.fetchall()
+
+        return [
+            LastQuizCompletionTimes(
+                quiz_id=row.quiz_id, completion_data=row.last_completed
+            )
             for row in rows
         ]
