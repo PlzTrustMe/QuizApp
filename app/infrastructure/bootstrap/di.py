@@ -47,6 +47,7 @@ from app.core.commands.user.sign_in_by_oauth import SignInByOauth
 from app.core.commands.user.sign_up import SignUp
 from app.core.common.access_service import AccessService
 from app.core.common.commiter import Commiter
+from app.core.interfaces.cache import CacheGateway
 from app.core.interfaces.company_gateways import (
     CompanyGateway,
     CompanyReader,
@@ -85,6 +86,7 @@ from app.infrastructure.auth.access_token_processor import AccessTokenProcessor
 from app.infrastructure.auth.id_provider import TokenIdProvider
 from app.infrastructure.auth.password_hasher import ArgonPasswordHasher
 from app.infrastructure.bootstrap.configs import load_all_configs
+from app.infrastructure.cache.cache import RedisCache
 from app.infrastructure.cache.config import RedisConfig
 from app.infrastructure.cache.provider import get_redis
 from app.infrastructure.gateways.company import (
@@ -260,6 +262,7 @@ def interactor_provider() -> Provider:
 def cache_provider() -> Provider:
     provider = Provider()
 
+    provider.provide(RedisCache, scope=Scope.REQUEST, provides=CacheGateway)
     provider.provide(get_redis, scope=Scope.APP)
 
     return provider

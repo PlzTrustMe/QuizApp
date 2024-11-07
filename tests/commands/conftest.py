@@ -2,6 +2,7 @@ import pytest
 
 from app.core.common.access_service import AccessService
 from app.core.entities.user import User
+from tests.mocks.cache import FakeCache
 from tests.mocks.commiter import FakeCommiter
 from tests.mocks.company_gateways import (
     FakeCompanyMapper,
@@ -82,3 +83,8 @@ def participation_gateway() -> FakeQuizParticipationMapper:
 @pytest.fixture
 def quiz_result_gateway() -> FakeQuizResultMapper:
     return FakeQuizResultMapper()
+
+
+@pytest.fixture
+def cache() -> FakeCache:
+    return FakeCache()
