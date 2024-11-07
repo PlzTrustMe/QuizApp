@@ -5,7 +5,7 @@ from app.core.common.access_service import AccessService
 from app.core.entities.company import CompanyId
 from app.core.interfaces.company_gateways import CompanyGateway
 from app.core.interfaces.quiz_gateways import (
-    CompanyAverageScore,
+    AverageScore,
     QuizReader,
     TimeRange,
 )
@@ -19,7 +19,7 @@ class GetCompanyAverageScoresInputData:
 
 @dataclass(frozen=True)
 class GetCompanyAverageScoresOutputData:
-    result: list[CompanyAverageScore]
+    result: list[AverageScore]
 
 
 @dataclass

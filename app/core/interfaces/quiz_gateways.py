@@ -104,7 +104,7 @@ class LastQuizCompletionTimes:
 
 
 @dataclass(frozen=True)
-class CompanyAverageScore:
+class AverageScore:
     start_date: datetime
     average: Decimal
 
@@ -155,5 +155,11 @@ class QuizReader(Protocol):
     @abstractmethod
     async def get_company_average_scores_over_time(
         self, company_id: CompanyId, time_range: TimeRange
-    ) -> list[CompanyAverageScore]:
+    ) -> list[AverageScore]:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def get_company_user_quiz_average_scores(
+        self, company_user_id: CompanyUserId, time_range: TimeRange
+    ) -> list[AverageScore]:
         raise NotImplementedError

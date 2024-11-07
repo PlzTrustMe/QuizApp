@@ -88,6 +88,9 @@ from app.core.queries.quiz.get_all_quiz_average import GetAllQuizAverage
 from app.core.queries.quiz.get_company_average_scores import (
     GetCompanyAverageScores,
 )
+from app.core.queries.quiz.get_company_user_quiz_average import (
+    GetCompanyUserQuizAverage,
+)
 from app.core.queries.quiz.get_my_overall_rating import GetMyOverallRating
 from app.core.queries.quiz.get_quiz_result import GetQuizResult
 from app.core.queries.quiz.get_quizzes import GetAllQuizzes
@@ -273,6 +276,7 @@ def interactor_provider() -> Provider:
         GetAllQuizAverage,
         GetLastCompletionTimes,
         GetCompanyAverageScores,
+        GetCompanyUserQuizAverage,
         scope=Scope.REQUEST,
     )
 

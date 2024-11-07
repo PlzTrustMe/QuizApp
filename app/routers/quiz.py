@@ -50,6 +50,11 @@ from app.core.queries.quiz.get_company_average_scores import (
     GetCompanyAverageScoresInputData,
     GetCompanyAverageScoresOutputData,
 )
+from app.core.queries.quiz.get_company_user_quiz_average import (
+    GetCompanyUserQuizAverage,
+    GetCompanyUserQuizAverageInputData,
+    GetCompanyUserQuizAverageOutputData,
+)
 from app.core.queries.quiz.get_my_overall_rating import (
     GetMyOverallRating,
     GetMyOverallRatingOutputData,
@@ -122,6 +127,22 @@ async def get_company_average_score(
 ) -> OkResponse[GetCompanyAverageScoresOutputData]:
     output_data = await action(
         GetCompanyAverageScoresInputData(company_id, time_range)
+    )
+
+    return OkResponse(result=output_data)
+
+
+@quiz_router.get(
+    "/company-user-average-score/{company_user_id}",
+    status_code=status.HTTP_200_OK,
+)
+async def get_company_user_quiz_average(
+    company_user_id: int,
+    time_range: TimeRange,
+    action: FromDishka[GetCompanyUserQuizAverage],
+) -> OkResponse[GetCompanyUserQuizAverageOutputData]:
+    output_data = await action(
+        GetCompanyUserQuizAverageInputData(company_user_id, time_range)
     )
 
     return OkResponse(result=output_data)
