@@ -1,6 +1,7 @@
 from abc import abstractmethod
 from asyncio import Protocol
 from dataclasses import dataclass
+from datetime import datetime
 
 from app.core.common.pagination import Pagination
 from app.core.entities.company import CompanyId, CompanyUserId
@@ -88,6 +89,12 @@ class QuizDetail:
     questions: list[QuestionDetail]
 
 
+@dataclass(frozen=True)
+class QuizAverage:
+    quiz_id: int
+    average: float
+
+
 class QuizReader(Protocol):
     @abstractmethod
     async def get_many(
@@ -111,4 +118,10 @@ class QuizReader(Protocol):
 
     @abstractmethod
     async def get_overall_rating(self, user_id: UserId) -> int:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def get_user_quiz_averages(
+        self, user_id: UserId, start_data: datetime, end_data: datetime
+    ) -> list[QuizAverage]:
         raise NotImplementedError

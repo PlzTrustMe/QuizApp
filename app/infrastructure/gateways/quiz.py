@@ -1,6 +1,16 @@
+from datetime import datetime
 from decimal import Decimal
 
-from sqlalchemy import Float, RowMapping, and_, cast, delete, func, select
+from sqlalchemy import (
+    Float,
+    RowMapping,
+    and_,
+    between,
+    cast,
+    delete,
+    func,
+    select,
+)
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -22,6 +32,7 @@ from app.core.interfaces.quiz_gateways import (
     AnswerGateway,
     QuestionDetail,
     QuestionGateway,
+    QuizAverage,
     QuizDetail,
     QuizFilters,
     QuizGateway,
@@ -336,3 +347,46 @@ class SQLAlchemyQuizReader(QuizReader):
         result = await self.session.execute(query)
 
         return result.scalar() if result else Decimal(0)
+
+    async def get_user_quiz_averages(
+        self,
+        user_id: int,
+        start_date: datetime,
+        end_date: datetime,
+    ) -> list[QuizAverage]:
+        query = (
+            select(
+                quiz_participations_table.c.quiz_id,
+                func.avg(quiz_results_table.c.correct_answers).label(
+                    "average_score"
+                ),
+            )
+            .select_from(
+                quiz_results_table.join(
+                    quiz_participations_table,
+                    quiz_results_table.c.quiz_participation_id
+                    == quiz_participations_table.c.quiz_participation_id,
+                ).join(
+                    company_users_table,
+                    quiz_participations_table.c.company_user_id
+                    == company_users_table.c.company_user_id,
+                )
+            )
+            .where(
+                company_users_table.c.user_id == user_id,
+                between(
+                    quiz_participations_table.c.created_at,
+                    start_date,
+                    end_date,
+                ),
+            )
+            .group_by(quiz_participations_table.c.quiz_id)
+        )
+
+        result = await self.session.execute(query)
+        rows = result.fetchall()
+
+        return [
+            QuizAverage(quiz_id=row.quiz_id, average=float(row.average_score))
+            for row in rows
+        ]

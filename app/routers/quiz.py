@@ -1,4 +1,5 @@
 import os.path
+from datetime import datetime
 from typing import Annotated
 
 from dishka import FromDishka
@@ -37,6 +38,7 @@ from app.core.queries.quiz.get_all_company_quiz_result import (
 )
 from app.core.queries.quiz.get_all_quiz_average import (
     GetAllQuizAverage,
+    GetAllQuizAverageInputData,
     GetAllQuizAverageOutputData,
 )
 from app.core.queries.quiz.get_my_overall_rating import (
@@ -52,6 +54,10 @@ from app.core.queries.quiz.get_quizzes import (
     GetAllQuizzes,
     GetAllQuizzesInputData,
     GetAllQuizzesOutputData,
+)
+from app.core.queries.quiz.get_total_quiz_average import (
+    GetTotalQuizAverage,
+    GetTotalQuizAverageOutputData,
 )
 from app.routers.responses.base import OkResponse
 from app.schemas.quiz import (
@@ -89,10 +95,23 @@ async def export_quiz_result(
 
 
 @quiz_router.get("/average", status_code=status.HTTP_200_OK)
+async def get_total_quizzes_average(
+    action: FromDishka[GetTotalQuizAverage],
+) -> OkResponse[GetTotalQuizAverageOutputData]:
+    output_data = await action()
+
+    return OkResponse(result=output_data)
+
+
+@quiz_router.get("/all/average", status_code=status.HTTP_200_OK)
 async def get_all_quizzes_average(
     action: FromDishka[GetAllQuizAverage],
+    start_data: datetime,
+    end_data: datetime,
 ) -> OkResponse[GetAllQuizAverageOutputData]:
-    output_data = await action()
+    output_data = await action(
+        GetAllQuizAverageInputData(start_data, end_data)
+    )
 
     return OkResponse(result=output_data)
 
