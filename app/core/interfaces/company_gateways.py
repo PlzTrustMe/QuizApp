@@ -61,6 +61,10 @@ class CompanyUserGateway(Protocol):
         raise NotImplementedError
 
     @abstractmethod
+    async def by_identity(self, user_id: UserId) -> CompanyUser | None:
+        raise NotImplementedError
+
+    @abstractmethod
     async def many(self, filters: CompanyUserFilters) -> list[CompanyUser]:
         raise NotImplementedError
 

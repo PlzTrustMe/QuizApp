@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.commands.user.errors import UnexpectedError
 from app.core.common.pagination import Pagination, SortOrder
-from app.core.entities.notification import Notification
+from app.core.entities.notification import Notification, NotificationId
 from app.core.interfaces.notification_gateways import (
     NotificationDetail,
     NotificationFilters,
@@ -28,6 +28,15 @@ class NotificationMapper(NotificationGateway):
         except IntegrityError as error:
             raise UnexpectedError from error
 
+    async def by_id(self, notification_id: NotificationId) -> Notification:
+        query = select(Notification).where(
+            notifications_table.c.notification_id == notification_id
+        )
+
+        result = await self.session.execute(query)
+
+        return result.scalar_one_or_none()
+
 
 class SQLAlchemyNotificationReader(NotificationReader):
     def __init__(self, session: AsyncSession):
@@ -40,6 +49,9 @@ class SQLAlchemyNotificationReader(NotificationReader):
             query = query.where(
                 notifications_table.c.send_to == filters.company_user_id
             )
+
+        if filters.status:
+            query = query.where(notifications_table.c.status == filters.status)
 
         return query
 

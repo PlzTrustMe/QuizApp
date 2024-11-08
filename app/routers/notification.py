@@ -4,6 +4,10 @@ from dishka import FromDishka
 from dishka.integrations.fastapi import DishkaRoute
 from fastapi import APIRouter, Query, status
 
+from app.core.commands.notification.mark_read_notification import (
+    MarkReadNotification,
+    MarkReadNotificationInputData,
+)
 from app.core.common.pagination import Pagination, SortOrder
 from app.core.entities.notification import NotificationStatus
 from app.core.queries.notification.get_my_notifications import (
@@ -39,3 +43,14 @@ async def get_my_notifications(
     )
 
     return OkResponse(result=output_data)
+
+
+@notification_router.put(
+    "/{notification_id}/status", status_code=status.HTTP_200_OK
+)
+async def mark_read_notification(
+    notification_id: int, action: FromDishka[MarkReadNotification]
+) -> OkResponse:
+    await action(MarkReadNotificationInputData(notification_id))
+
+    return OkResponse()

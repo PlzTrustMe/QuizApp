@@ -3,11 +3,22 @@ from asyncio import Protocol
 from dataclasses import dataclass
 
 from app.core.common.pagination import Pagination
-from app.core.entities.notification import Notification, NotificationStatus
+from app.core.entities.notification import (
+    Notification,
+    NotificationId,
+    NotificationStatus,
+)
 
 
 class NotificationGateway(Protocol):
+    @abstractmethod
     async def add_many(self, notifications: list[Notification]) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def by_id(
+        self, notification_id: NotificationId
+    ) -> Notification | None:
         raise NotImplementedError
 
 

@@ -34,6 +34,9 @@ from app.core.commands.invitation.send_invitation_to_user import (
 from app.core.commands.invitation.send_request_from_user import (
     SendRequestFromUser,
 )
+from app.core.commands.notification.mark_read_notification import (
+    MarkReadNotification,
+)
 from app.core.commands.notification.service import NotificationService
 from app.core.commands.quiz.create_quiz import CreateQuiz
 from app.core.commands.quiz.delete_quiz import DeleteQuiz
@@ -305,7 +308,9 @@ def interactor_provider() -> Provider:
         scope=Scope.REQUEST,
     )
 
-    provider.provide_all(GetMyNotifications, scope=Scope.REQUEST)
+    provider.provide_all(
+        GetMyNotifications, MarkReadNotification, scope=Scope.REQUEST
+    )
 
     return provider
 
