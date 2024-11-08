@@ -63,7 +63,10 @@ from app.core.interfaces.invitation_gateways import (
     UserRequestGateway,
     UserRequestReader,
 )
-from app.core.interfaces.notification_gateways import NotificationGateway
+from app.core.interfaces.notification_gateways import (
+    NotificationGateway,
+    NotificationReader,
+)
 from app.core.interfaces.password_hasher import PasswordHasher
 from app.core.interfaces.quiz_gateways import (
     AnswerGateway,
@@ -80,6 +83,9 @@ from app.core.queries.company.get_company_users import GetCompanyUsers
 from app.core.queries.company.get_many_companies import GetManyCompanies
 from app.core.queries.invitation.get_invitations import GetInvitations
 from app.core.queries.invitation.get_user_requests import GetUserRequests
+from app.core.queries.notification.get_my_notifications import (
+    GetMyNotifications,
+)
 from app.core.queries.quiz.get_all_company_quiz_result import (
     GetAllCompanyQuizResult,
 )
@@ -122,7 +128,10 @@ from app.infrastructure.gateways.invite import (
     SQLAlchemyUserRequestReader,
     UserRequestMapper,
 )
-from app.infrastructure.gateways.notification import NotificationMapper
+from app.infrastructure.gateways.notification import (
+    NotificationMapper,
+    SQLAlchemyNotificationReader,
+)
 from app.infrastructure.gateways.quiz import (
     AnswerMapper,
     QuestionMapper,
@@ -212,6 +221,11 @@ def gateway_provider() -> Provider:
     provider.provide(
         NotificationMapper, scope=Scope.REQUEST, provides=NotificationGateway
     )
+    provider.provide(
+        SQLAlchemyNotificationReader,
+        scope=Scope.REQUEST,
+        provides=NotificationReader,
+    )
 
     provider.provide(
         SACommiter,
@@ -290,6 +304,8 @@ def interactor_provider() -> Provider:
         GetCompanyUserLastAttempt,
         scope=Scope.REQUEST,
     )
+
+    provider.provide_all(GetMyNotifications, scope=Scope.REQUEST)
 
     return provider
 
