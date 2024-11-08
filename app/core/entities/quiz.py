@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from datetime import UTC, datetime
 from typing import NewType
 
 from app.core.entities.company import CompanyId, CompanyUserId
@@ -39,6 +40,7 @@ class QuizParticipation:
     quiz_participation_id: QuizParticipationId | None
     quiz_id: QuizId
     company_user_id: CompanyUserId
+    created_at: datetime = datetime.now(tz=UTC)
 
 
 @dataclass

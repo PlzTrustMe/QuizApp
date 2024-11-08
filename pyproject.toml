@@ -21,6 +21,7 @@ email-validator = "^2.2.0"
 orjson = "^3.10.10"
 pyjwt = "^2.9.0"
 cryptography = "^43.0.3"
+apscheduler = "^3.10.4"
 
 
 [tool.poetry.group.test.dependencies]

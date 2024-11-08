@@ -38,6 +38,7 @@ from app.core.commands.notification.mark_read_notification import (
     MarkReadNotification,
 )
 from app.core.commands.notification.service import NotificationService
+from app.core.commands.quiz.check_available_quiz import CheckAvailableQuiz
 from app.core.commands.quiz.create_quiz import CreateQuiz
 from app.core.commands.quiz.delete_quiz import DeleteQuiz
 from app.core.commands.quiz.edit_quiz_title import EditQuizTitle
@@ -305,6 +306,7 @@ def interactor_provider() -> Provider:
         GetCompanyAverageScores,
         GetCompanyUserQuizAverage,
         GetCompanyUserLastAttempt,
+        CheckAvailableQuiz,
         scope=Scope.REQUEST,
     )
 

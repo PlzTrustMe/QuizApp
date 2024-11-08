@@ -131,6 +131,13 @@ class QuizParticipationMapper(QuizParticipationGateway):
 
         return result.scalar_one_or_none()
 
+    async def many(self) -> list[QuizParticipation]:
+        query = select(QuizParticipation)
+
+        result = await self.session.execute(query)
+
+        return list(result.scalars().all())
+
 
 class QuizResultMapper(QuizResultGateway):
     def __init__(self, session: AsyncSession):

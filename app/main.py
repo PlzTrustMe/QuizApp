@@ -2,6 +2,8 @@ import logging
 from contextlib import asynccontextmanager
 
 import uvicorn
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from dishka import AsyncContainer
 from dishka.integrations.fastapi import setup_dishka
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -9,9 +11,18 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import load_config
 from app.infrastructure.bootstrap.di import setup_http_di
 from app.infrastructure.persistence.models import map_tables
+from app.infrastructure.tasks import setup_tasks
 from app.routers import setup_routers
 
 logger = logging.getLogger(__name__)
+
+
+def setup_scheduler(container: AsyncContainer) -> None:
+    scheduler = AsyncIOScheduler()
+
+    setup_tasks(scheduler, container)
+
+    scheduler.start()
 
 
 def setup_middlewares(app: FastAPI) -> None:
@@ -44,7 +55,10 @@ def create_app() -> FastAPI:
     setup_routers(app)
     setup_middlewares(app)
 
-    setup_dishka(setup_http_di(), app)
+    container = setup_http_di()
+    setup_dishka(container, app)
+
+    setup_scheduler(container)
 
     map_tables()
 
