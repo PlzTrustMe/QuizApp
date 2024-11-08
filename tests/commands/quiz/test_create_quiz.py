@@ -1,3 +1,4 @@
+from app.core.commands.notification.service import NotificationService
 from app.core.commands.quiz.create_quiz import (
     AnswerData,
     CreateQuiz,
@@ -20,6 +21,7 @@ async def test_create_quiz(
     quiz_gateway: FakeQuizMapper,
     question_gateway: FakeQuestionMapper,
     answer_gateway: FakeAnswerMapper,
+    notification_service: NotificationService,
     commiter: FakeCommiter,
 ) -> None:
     command = CreateQuiz(
@@ -28,6 +30,7 @@ async def test_create_quiz(
         quiz_gateway,
         question_gateway,
         answer_gateway,
+        notification_service,
         commiter,
     )
 

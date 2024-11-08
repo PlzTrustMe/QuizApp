@@ -1,5 +1,6 @@
 import pytest
 
+from app.core.commands.notification.service import NotificationService
 from app.core.common.access_service import AccessService
 from app.core.entities.user import User
 from tests.mocks.cache import FakeCache
@@ -13,6 +14,7 @@ from tests.mocks.invitation_gateways import (
     FakeInvitationMapper,
     FakeUserRequestMapper,
 )
+from tests.mocks.notification_gateway import FakeNotificationMapper
 from tests.mocks.quiz_gateways import (
     FakeAnswerMapper,
     FakeQuestionMapper,
@@ -88,3 +90,16 @@ def quiz_result_gateway() -> FakeQuizResultMapper:
 @pytest.fixture
 def cache() -> FakeCache:
     return FakeCache()
+
+
+@pytest.fixture
+def notification_gateway() -> FakeNotificationMapper:
+    return FakeNotificationMapper()
+
+
+@pytest.fixture
+def notification_service(
+    notification_gateway: FakeNotificationMapper,
+    company_user_gateway: FakeCompanyUserMapper,
+) -> NotificationService:
+    return NotificationService(notification_gateway, company_user_gateway)

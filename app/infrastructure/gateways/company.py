@@ -117,6 +117,15 @@ class CompanyUserMapper(CompanyUserGateway):
 
         return result.scalar_one_or_none()
 
+    async def many(self, filters: CompanyUserFilters) -> list[CompanyUser]:
+        query = select(CompanyUser).where(
+            company_users_table.c.company_id == filters.company_id
+        )
+
+        result = await self.session.execute(query)
+
+        return list(result.scalars().all())
+
     async def delete(self, company_user_id: CompanyUserId) -> None:
         query = delete(CompanyUser).where(
             company_users_table.c.company_user_id == company_user_id

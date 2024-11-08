@@ -34,6 +34,7 @@ from app.core.commands.invitation.send_invitation_to_user import (
 from app.core.commands.invitation.send_request_from_user import (
     SendRequestFromUser,
 )
+from app.core.commands.notification.service import NotificationService
 from app.core.commands.quiz.create_quiz import CreateQuiz
 from app.core.commands.quiz.delete_quiz import DeleteQuiz
 from app.core.commands.quiz.edit_quiz_title import EditQuizTitle
@@ -62,6 +63,7 @@ from app.core.interfaces.invitation_gateways import (
     UserRequestGateway,
     UserRequestReader,
 )
+from app.core.interfaces.notification_gateways import NotificationGateway
 from app.core.interfaces.password_hasher import PasswordHasher
 from app.core.interfaces.quiz_gateways import (
     AnswerGateway,
@@ -120,6 +122,7 @@ from app.infrastructure.gateways.invite import (
     SQLAlchemyUserRequestReader,
     UserRequestMapper,
 )
+from app.infrastructure.gateways.notification import NotificationMapper
 from app.infrastructure.gateways.quiz import (
     AnswerMapper,
     QuestionMapper,
@@ -204,6 +207,10 @@ def gateway_provider() -> Provider:
         QuizParticipationMapper,
         scope=Scope.REQUEST,
         provides=QuizParticipationGateway,
+    )
+
+    provider.provide(
+        NotificationMapper, scope=Scope.REQUEST, provides=NotificationGateway
     )
 
     provider.provide(
@@ -314,6 +321,7 @@ def service_provider() -> Provider:
         provides=PasswordHasher,
     )
     provider.provide(AccessService, scope=Scope.REQUEST)
+    provider.provide(NotificationService, scope=Scope.REQUEST)
 
     return provider
 
