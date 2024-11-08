@@ -113,3 +113,6 @@ class AccessService:
 
     async def ensure_can_delete_quiz(self, company: Company):
         await self._is_owner_or_admin(company)
+
+    async def ensure_can_get_quiz_result(self, company: Company):
+        await self._is_owner_or_admin(company)
