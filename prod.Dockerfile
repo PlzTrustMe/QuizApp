@@ -21,6 +21,7 @@ ENV VIRTUAL_ENV=/backend/.venv \
 COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 
 COPY app ./app
+COPY .env ./
 COPY alembic.ini ./
 
 CMD ["python", "-m", "app.main"]
