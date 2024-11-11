@@ -34,6 +34,10 @@ from app.core.commands.invitation.send_invitation_to_user import (
 from app.core.commands.invitation.send_request_from_user import (
     SendRequestFromUser,
 )
+from app.core.commands.notification.mark_read_notification import (
+    MarkReadNotification,
+)
+from app.core.commands.notification.service import NotificationService
 from app.core.commands.quiz.create_quiz import CreateQuiz
 from app.core.commands.quiz.delete_quiz import DeleteQuiz
 from app.core.commands.quiz.edit_quiz_title import EditQuizTitle
@@ -62,6 +66,10 @@ from app.core.interfaces.invitation_gateways import (
     UserRequestGateway,
     UserRequestReader,
 )
+from app.core.interfaces.notification_gateways import (
+    NotificationGateway,
+    NotificationReader,
+)
 from app.core.interfaces.password_hasher import PasswordHasher
 from app.core.interfaces.quiz_gateways import (
     AnswerGateway,
@@ -78,6 +86,9 @@ from app.core.queries.company.get_company_users import GetCompanyUsers
 from app.core.queries.company.get_many_companies import GetManyCompanies
 from app.core.queries.invitation.get_invitations import GetInvitations
 from app.core.queries.invitation.get_user_requests import GetUserRequests
+from app.core.queries.notification.get_my_notifications import (
+    GetMyNotifications,
+)
 from app.core.queries.quiz.get_all_company_quiz_result import (
     GetAllCompanyQuizResult,
 )
@@ -119,6 +130,10 @@ from app.infrastructure.gateways.invite import (
     SQLAlchemyInvitationReader,
     SQLAlchemyUserRequestReader,
     UserRequestMapper,
+)
+from app.infrastructure.gateways.notification import (
+    NotificationMapper,
+    SQLAlchemyNotificationReader,
 )
 from app.infrastructure.gateways.quiz import (
     AnswerMapper,
@@ -207,6 +222,15 @@ def gateway_provider() -> Provider:
     )
 
     provider.provide(
+        NotificationMapper, scope=Scope.REQUEST, provides=NotificationGateway
+    )
+    provider.provide(
+        SQLAlchemyNotificationReader,
+        scope=Scope.REQUEST,
+        provides=NotificationReader,
+    )
+
+    provider.provide(
         SACommiter,
         scope=Scope.REQUEST,
         provides=Commiter,
@@ -284,6 +308,10 @@ def interactor_provider() -> Provider:
         scope=Scope.REQUEST,
     )
 
+    provider.provide_all(
+        GetMyNotifications, MarkReadNotification, scope=Scope.REQUEST
+    )
+
     return provider
 
 
@@ -314,6 +342,7 @@ def service_provider() -> Provider:
         provides=PasswordHasher,
     )
     provider.provide(AccessService, scope=Scope.REQUEST)
+    provider.provide(NotificationService, scope=Scope.REQUEST)
 
     return provider
 

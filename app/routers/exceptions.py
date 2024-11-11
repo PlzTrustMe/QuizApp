@@ -17,6 +17,7 @@ from app.core.commands.invitation.errors import (
     UserRequestAlreadyExistError,
     UserRequestNotFoundError,
 )
+from app.core.commands.notification.errors import NotificationNotFoundError
 from app.core.commands.quiz.errors import (
     InvalidAnswerQuantityError,
     InvalidAnswersValidateError,
@@ -106,6 +107,9 @@ def setup_exception_handlers(app: FastAPI) -> None:
     )
     app.add_exception_handler(
         CompanyUserNotFoundError, error_handler(status.HTTP_404_NOT_FOUND)
+    )
+    app.add_exception_handler(
+        NotificationNotFoundError, error_handler(status.HTTP_404_NOT_FOUND)
     )
     app.add_exception_handler(
         UserEmailAlreadyExistError, error_handler(status.HTTP_409_CONFLICT)

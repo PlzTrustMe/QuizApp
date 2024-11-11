@@ -2,6 +2,7 @@ import logging
 from dataclasses import dataclass
 
 from app.core.commands.company.errors import CompanyNotFoundError
+from app.core.commands.notification.service import NotificationService
 from app.core.commands.quiz.errors import (
     InvalidAnswerQuantityError,
     InvalidAnswersValidateError,
@@ -46,6 +47,7 @@ class CreateQuiz:
     quiz_gateway: QuizGateway
     question_gateway: QuestionGateway
     answer_gateway: AnswerGateway
+    notification_service: NotificationService
     commiter: Commiter
 
     async def __call__(self, data: CreateQuizInputData) -> QuizId:
@@ -69,6 +71,11 @@ class CreateQuiz:
         await self.quiz_gateway.add(new_quiz)
 
         await self._add_questions_to_quiz(new_quiz.quiz_id, data.questions)
+
+        await self.notification_service.send_notification(
+            text=f"Hey, a new quiz has been created - {new_quiz.quiz_id}",
+            company=company,
+        )
 
         await self.commiter.commit()
 

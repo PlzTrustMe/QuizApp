@@ -10,6 +10,7 @@ from app.core.entities.user import UserId
 from app.core.entities.value_objects import CompanyDescription, CompanyName
 from app.core.interfaces.company_gateways import (
     CompanyGateway,
+    CompanyUserFilters,
     CompanyUserGateway,
 )
 
@@ -77,6 +78,16 @@ class FakeCompanyUserMapper(CompanyUserGateway):
         ):
             return self.company_user
         return None
+
+    async def by_identity(self, user_id: UserId) -> CompanyUser | None:
+        if self.company_user.user_id == user_id:
+            return self.company_user
+        return None
+
+    async def many(self, filters: CompanyUserFilters) -> list[CompanyUser]:
+        if self.company_user.company_id == filters.company_id:
+            return [self.company_user]
+        return []
 
     async def delete(self, company_user_id: CompanyUserId) -> None:
         if self.company_user.company_user_id == company_user_id:

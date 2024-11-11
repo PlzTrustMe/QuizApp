@@ -15,6 +15,12 @@ from app.core.entities.user import UserId
 from app.core.entities.value_objects import CompanyName
 
 
+@dataclass(frozen=True)
+class CompanyUserFilters:
+    company_id: int
+    company_role: CompanyRole | None = None
+
+
 class CompanyGateway(Protocol):
     @abstractmethod
     async def add(self, company: Company) -> None:
@@ -55,6 +61,14 @@ class CompanyUserGateway(Protocol):
         raise NotImplementedError
 
     @abstractmethod
+    async def by_identity(self, user_id: UserId) -> CompanyUser | None:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def many(self, filters: CompanyUserFilters) -> list[CompanyUser]:
+        raise NotImplementedError
+
+    @abstractmethod
     async def delete(self, company_user_id: CompanyUserId) -> None:
         raise NotImplementedError
 
@@ -86,12 +100,6 @@ class CompanyReader(Protocol):
     @abstractmethod
     async def total(self, filters: CompanyFilters) -> int:
         raise NotImplementedError
-
-
-@dataclass(frozen=True)
-class CompanyUserFilters:
-    company_id: int
-    company_role: CompanyRole | None = None
 
 
 @dataclass(frozen=True)

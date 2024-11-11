@@ -55,5 +55,10 @@ def map_company_users_table() -> None:
                 back_populates="company_user",
                 cascade="all, delete-orphan",
             ),
+            "notification": relationship(
+                "Notification",
+                back_populates="company_user",
+                cascade="all, delete-orphan",
+            ),
         },
     )
