@@ -1,6 +1,9 @@
 from abc import abstractmethod
 from asyncio import Protocol
 from dataclasses import dataclass
+from datetime import datetime
+from decimal import Decimal
+from enum import Enum
 
 from app.core.common.pagination import Pagination
 from app.core.entities.company import CompanyId, CompanyUserId
@@ -13,6 +16,7 @@ from app.core.entities.quiz import (
     QuizParticipationId,
     QuizResult,
 )
+from app.core.entities.user import UserId
 
 
 class QuizGateway(Protocol):
@@ -87,6 +91,36 @@ class QuizDetail:
     questions: list[QuestionDetail]
 
 
+@dataclass(frozen=True)
+class QuizAverage:
+    quiz_id: int
+    average: float
+
+
+@dataclass(frozen=True)
+class LastQuizCompletionTimes:
+    quiz_id: int
+    completion_data: datetime
+
+
+@dataclass(frozen=True)
+class AverageScore:
+    start_date: datetime
+    average: Decimal
+
+
+class TimeRange(str, Enum):
+    YEAR = "year"
+    MONTH = "month"
+    WEEK = "week"
+
+
+@dataclass(frozen=True)
+class UserLastAttempt:
+    user_id: int
+    last_attempt: datetime
+
+
 class QuizReader(Protocol):
     @abstractmethod
     async def get_many(
@@ -106,4 +140,38 @@ class QuizReader(Protocol):
 
     @abstractmethod
     async def total_average(self) -> float:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def get_overall_rating(self, user_id: UserId) -> int:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def get_user_quiz_averages(
+        self, user_id: UserId, start_data: datetime, end_data: datetime
+    ) -> list[QuizAverage]:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def get_all_last_quiz_completion_times(
+        self, user_id: UserId
+    ) -> list[LastQuizCompletionTimes]:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def get_company_average_scores_over_time(
+        self, company_id: CompanyId, time_range: TimeRange
+    ) -> list[AverageScore]:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def get_company_user_quiz_average_scores(
+        self, company_user_id: CompanyUserId, time_range: TimeRange
+    ) -> list[AverageScore]:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def get_company_users_last_attempt(
+        self, company_id: CompanyId
+    ) -> list[UserLastAttempt]:
         raise NotImplementedError

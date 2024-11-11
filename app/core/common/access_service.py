@@ -116,3 +116,6 @@ class AccessService:
 
     async def ensure_can_get_quiz_result(self, company: Company):
         await self._is_owner_or_admin(company)
+
+    async def ensure_can_get_company_average_scores(self, company: Company):
+        await self._is_owner_or_admin(company)

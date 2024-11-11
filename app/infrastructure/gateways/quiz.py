@@ -1,4 +1,16 @@
-from sqlalchemy import Float, RowMapping, and_, cast, delete, func, select
+from datetime import datetime
+from decimal import Decimal
+
+from sqlalchemy import (
+    Float,
+    RowMapping,
+    and_,
+    between,
+    cast,
+    delete,
+    func,
+    select,
+)
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -14,17 +26,26 @@ from app.core.entities.quiz import (
     QuizParticipationId,
     QuizResult,
 )
+from app.core.entities.user import UserId
 from app.core.interfaces.quiz_gateways import (
     AnswerDetail,
     AnswerGateway,
+    AverageScore,
+    LastQuizCompletionTimes,
     QuestionDetail,
     QuestionGateway,
+    QuizAverage,
     QuizDetail,
     QuizFilters,
     QuizGateway,
     QuizParticipationGateway,
     QuizReader,
     QuizResultGateway,
+    TimeRange,
+    UserLastAttempt,
+)
+from app.infrastructure.persistence.models.company_user import (
+    company_users_table,
 )
 from app.infrastructure.persistence.models.quiz import (
     answers_table,
@@ -305,3 +326,208 @@ class SQLAlchemyQuizReader(QuizReader):
         average_score_percentage = result.scalar()
 
         return average_score_percentage
+
+    async def get_overall_rating(self, user_id: UserId) -> Decimal:
+        query = (
+            select(
+                func.avg(quiz_results_table.c.correct_answers).label(
+                    "overall_rating"
+                )
+            )
+            .select_from(
+                quiz_results_table.join(
+                    quiz_participations_table,
+                    quiz_results_table.c.quiz_participation_id
+                    == quiz_participations_table.c.quiz_participation_id,
+                ).join(
+                    company_users_table,
+                    quiz_participations_table.c.company_user_id
+                    == company_users_table.c.company_user_id,
+                )
+            )
+            .where(company_users_table.c.user_id == user_id)
+        )
+
+        result = await self.session.execute(query)
+
+        return result.scalar() if result else Decimal(0)
+
+    async def get_user_quiz_averages(
+        self,
+        user_id: int,
+        start_date: datetime,
+        end_date: datetime,
+    ) -> list[QuizAverage]:
+        query = (
+            select(
+                quiz_participations_table.c.quiz_id,
+                func.avg(quiz_results_table.c.correct_answers).label(
+                    "average_score"
+                ),
+            )
+            .select_from(
+                quiz_results_table.join(
+                    quiz_participations_table,
+                    quiz_results_table.c.quiz_participation_id
+                    == quiz_participations_table.c.quiz_participation_id,
+                ).join(
+                    company_users_table,
+                    quiz_participations_table.c.company_user_id
+                    == company_users_table.c.company_user_id,
+                )
+            )
+            .where(
+                company_users_table.c.user_id == user_id,
+                between(
+                    quiz_participations_table.c.created_at,
+                    start_date,
+                    end_date,
+                ),
+            )
+            .group_by(quiz_participations_table.c.quiz_id)
+        )
+
+        result = await self.session.execute(query)
+        rows = result.fetchall()
+
+        return [
+            QuizAverage(quiz_id=row.quiz_id, average=float(row.average_score))
+            for row in rows
+        ]
+
+    async def get_all_last_quiz_completion_times(
+        self, user_id: UserId
+    ) -> list[LastQuizCompletionTimes]:
+        query = (
+            select(
+                quiz_participations_table.c.quiz_id,
+                func.max(quiz_participations_table.c.created_at).label(
+                    "last_completed"
+                ),
+            )
+            .select_from(
+                quiz_participations_table.join(
+                    company_users_table,
+                    quiz_participations_table.c.company_user_id
+                    == company_users_table.c.company_user_id,
+                )
+            )
+            .where(company_users_table.c.user_id == user_id)
+            .group_by(quiz_participations_table.c.quiz_id)
+        )
+
+        result = await self.session.execute(query)
+        rows = result.fetchall()
+
+        return [
+            LastQuizCompletionTimes(
+                quiz_id=row.quiz_id, completion_data=row.last_completed
+            )
+            for row in rows
+        ]
+
+    async def get_company_average_scores_over_time(
+        self, company_id: int, time_range: TimeRange
+    ) -> list[AverageScore]:
+        query = (
+            select(
+                func.date_trunc(
+                    time_range, quiz_participations_table.c.created_at
+                ).label("time_range"),
+                func.avg(quiz_results_table.c.correct_answers).label(
+                    "average_score"
+                ),
+            )
+            .select_from(
+                quiz_results_table.join(
+                    quiz_participations_table,
+                    quiz_results_table.c.quiz_participation_id
+                    == quiz_participations_table.c.quiz_participation_id,
+                ).join(
+                    quizzes_table,
+                    quiz_participations_table.c.quiz_id
+                    == quizzes_table.c.quiz_id,
+                )
+            )
+            .where(quizzes_table.c.company_id == company_id)
+            .group_by("time_range")
+            .order_by("time_range")
+        )
+
+        result = await self.session.execute(query)
+        rows = result.fetchall()
+
+        return [
+            AverageScore(start_date=row.time_range, average=row.average_score)
+            for row in rows
+        ]
+
+    async def get_company_user_quiz_average_scores(
+        self, company_user_id: CompanyUserId, time_range: TimeRange
+    ) -> list[AverageScore]:
+        query = (
+            select(
+                quiz_participations_table.c.quiz_id,
+                func.date_trunc(
+                    time_range, quiz_participations_table.c.created_at
+                ).label("time_range"),
+                func.avg(quiz_results_table.c.correct_answers).label(
+                    "average_score"
+                ),
+            )
+            .select_from(
+                quiz_results_table.join(
+                    quiz_participations_table,
+                    quiz_results_table.c.quiz_participation_id
+                    == quiz_participations_table.c.quiz_participation_id,
+                ).join(
+                    company_users_table,
+                    quiz_participations_table.c.company_user_id
+                    == company_users_table.c.company_user_id,
+                )
+            )
+            .where(company_users_table.c.user_id == company_user_id)
+            .group_by(quiz_participations_table.c.quiz_id, "time_range")
+            .order_by(quiz_participations_table.c.quiz_id, "time_range")
+        )
+
+        result = await self.session.execute(query)
+        rows = result.fetchall()
+
+        return [
+            AverageScore(start_date=row.time_range, average=row.average_score)
+            for row in rows
+        ]
+
+    async def get_company_users_last_attempt(
+        self, company_id: CompanyId
+    ) -> list[UserLastAttempt]:
+        query = (
+            select(
+                company_users_table.c.user_id,
+                func.max(quiz_participations_table.c.created_at).label(
+                    "last_attempt"
+                ),
+            )
+            .select_from(
+                quiz_participations_table.join(
+                    company_users_table,
+                    quiz_participations_table.c.company_user_id
+                    == company_users_table.c.company_user_id,
+                ).join(
+                    quizzes_table,
+                    quiz_participations_table.c.quiz_id
+                    == quizzes_table.c.quiz_id,
+                )
+            )
+            .where(quizzes_table.c.company_id == company_id)
+            .group_by(company_users_table.c.user_id)
+        )
+
+        result = await self.session.execute(query)
+        rows = result.fetchall()
+
+        return [
+            UserLastAttempt(user_id=row.user_id, last_attempt=row.last_attempt)
+            for row in rows
+        ]
