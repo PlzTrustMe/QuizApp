@@ -52,7 +52,7 @@ jobs:
           AWS_REGION: ${{ secrets.AWS_REGION }}
           ECR_URI: ${{ secrets.ECR_URI }}
         run: |
-          SERVICE_ARN=$(aws apprunner list-services --query "ServiceSummaryList[?ServiceName=='quiz-app-service'].ServiceArn" --output text)
+          SERVICE_ARN=$(aws apprunner list-services --query "ServiceSummaryList[?ServiceName=='Quiz_App'].ServiceArn" --output text)
           if [ -z "$SERVICE_ARN" ]; then
             echo "Service not found in App Runner."
             exit 1
