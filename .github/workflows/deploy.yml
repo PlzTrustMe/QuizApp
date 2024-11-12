@@ -13,22 +13,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Log in to Amazon ECR
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        run: |
-          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_URI }}
-
-      - name: Build Docker image
-        run: docker build -t quiz-app -f prod.Dockerfile .
-
-      - name: Tag Docker image
-        run: docker tag quiz-app:latest ${{ secrets.ECR_URI }}/quiz/quiz-app
-
-      - name: Push Docker image to Amazon ECR
-        run: docker push ${{ secrets.ECR_URI }}/quiz/quiz-app:latest
-
       - name: Create .env file
         run: |
           echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
@@ -44,6 +28,22 @@ jobs:
           echo "JWT_ALGORITHM=${{ secrets.JWT_ALGORITHM }}" >> .env
           echo "DOMAIN=${{ secrets.DOMAIN }}" >> .env
           echo "AUDIENCE=${{ secrets.AUDIENCE }}" >> .env
+
+      - name: Log in to Amazon ECR
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_URI }}
+
+      - name: Build Docker image
+        run: docker build -t quiz-app -f prod.Dockerfile .
+
+      - name: Tag Docker image
+        run: docker tag quiz-app:latest ${{ secrets.ECR_URI }}/quiz/quiz-app
+
+      - name: Push Docker image to Amazon ECR
+        run: docker push ${{ secrets.ECR_URI }}/quiz/quiz-app:latest
 
       - name: Update App Runner Service
         env:
