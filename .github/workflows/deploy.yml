@@ -37,7 +37,7 @@ jobs:
           aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_URI }}
 
       - name: Build Docker image
-        run: docker build -t quiz-app -f prod.Dockerfile .
+        run: docker build --platform linux/amd64 -t quiz-app -f prod.Dockerfile .
 
       - name: Tag Docker image
         run: docker tag quiz-app:latest ${{ secrets.ECR_URI }}/quiz/quiz-app:latest
