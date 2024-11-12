@@ -17,7 +17,7 @@ from app.core.entities.value_objects import CompanyName
 
 @dataclass(frozen=True)
 class CompanyUserFilters:
-    company_id: int
+    company_id: int | None = None
     company_role: CompanyRole | None = None
 
 

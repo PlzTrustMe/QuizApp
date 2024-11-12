@@ -19,6 +19,11 @@ from app.core.entities.quiz import (
 from app.core.entities.user import UserId
 
 
+@dataclass
+class QuizFilters:
+    company_id: int | None = None
+
+
 class QuizGateway(Protocol):
     @abstractmethod
     async def add(self, quiz: Quiz) -> None:
@@ -26,6 +31,10 @@ class QuizGateway(Protocol):
 
     @abstractmethod
     async def by_id(self, quiz_id: QuizId) -> Quiz | None:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def many(self, filters: QuizFilters) -> list[Quiz]:
         raise NotImplementedError
 
     @abstractmethod
@@ -42,6 +51,10 @@ class QuizParticipationGateway(Protocol):
     async def by_id(
         self, quiz_participation_id: QuizParticipationId
     ) -> QuizParticipation | None:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def many(self) -> list[QuizParticipation]:
         raise NotImplementedError
 
 
@@ -61,11 +74,6 @@ class AnswerGateway(Protocol):
     @abstractmethod
     async def add_many(self, answers: list[Answer]) -> None:
         raise NotImplementedError
-
-
-@dataclass
-class QuizFilters:
-    company_id: int
 
 
 @dataclass(frozen=True)
