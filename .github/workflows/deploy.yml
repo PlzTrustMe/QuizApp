@@ -40,7 +40,7 @@ jobs:
         run: docker build -t quiz-app -f prod.Dockerfile .
 
       - name: Tag Docker image
-        run: docker tag quiz-app:latest ${{ secrets.ECR_URI }}/quiz/quiz-app
+        run: docker tag quiz-app:latest ${{ secrets.ECR_URI }}/quiz/quiz-app:latest
 
       - name: Push Docker image to Amazon ECR
         run: docker push ${{ secrets.ECR_URI }}/quiz/quiz-app:latest
