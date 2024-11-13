@@ -4,7 +4,7 @@ from typing import Annotated
 
 from dishka import FromDishka
 from dishka.integrations.fastapi import DishkaRoute
-from fastapi import APIRouter, Query, status
+from fastapi import APIRouter, File, Query, status
 from fastapi.responses import FileResponse
 
 from app.core.commands.quiz.create_quiz import (
@@ -28,6 +28,10 @@ from app.core.commands.quiz.save_quiz_result import (
     SaveQuizResultInputData,
 )
 from app.core.commands.quiz.take_quiz import TakeQuiz, TakeQuizInputData
+from app.core.commands.quiz.upload_quizzes import (
+    UploadQuizzes,
+    UploadQuizzesInputData,
+)
 from app.core.common.pagination import Pagination, SortOrder
 from app.core.entities.quiz import QuizId, QuizParticipationId, QuizResultId
 from app.core.interfaces.quiz_gateways import QuizFilters, TimeRange
@@ -291,6 +295,19 @@ async def save_quiz_result(
     )
 
     return OkResponse(status=201, result=output_data)
+
+
+@quiz_router.post(
+    "/upload-quiz/{company_id}", status_code=status.HTTP_201_CREATED
+)
+async def upload_quizzes(
+    company_id: int,
+    file: Annotated[bytes, File()],
+    action: FromDishka[UploadQuizzes],
+) -> OkResponse:
+    await action(UploadQuizzesInputData(company_id=company_id, quiz_data=file))
+
+    return OkResponse()
 
 
 @quiz_router.put("/{quiz_id}/title", status_code=status.HTTP_200_OK)

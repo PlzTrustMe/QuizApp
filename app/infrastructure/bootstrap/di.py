@@ -45,6 +45,7 @@ from app.core.commands.quiz.edit_quiz_title import EditQuizTitle
 from app.core.commands.quiz.export_quiz_result import ExportQuizResult
 from app.core.commands.quiz.save_quiz_result import SaveQuizResult
 from app.core.commands.quiz.take_quiz import TakeQuiz
+from app.core.commands.quiz.upload_quizzes import UploadQuizzes
 from app.core.commands.user.delete_user import DeleteUser
 from app.core.commands.user.edit_full_name import EditFullName
 from app.core.commands.user.edit_password import EditPassword
@@ -80,6 +81,7 @@ from app.core.interfaces.quiz_gateways import (
     QuizReader,
     QuizResultGateway,
 )
+from app.core.interfaces.upload_file import UploadFile
 from app.core.interfaces.user_gateways import UserGateway, UserReader
 from app.core.queries.company.get_company_by_id import GetCompanyById
 from app.core.queries.company.get_company_user import GetCompanyUser
@@ -120,6 +122,7 @@ from app.infrastructure.bootstrap.configs import load_all_configs
 from app.infrastructure.cache.cache import RedisCache
 from app.infrastructure.cache.config import RedisConfig
 from app.infrastructure.cache.provider import get_redis
+from app.infrastructure.files.upload_file import ExcelFileUpload
 from app.infrastructure.gateways.company import (
     CompanyMapper,
     CompanyUserMapper,
@@ -300,6 +303,7 @@ def interactor_provider() -> Provider:
         GetQuizResult,
         GetAllCompanyQuizResult,
         ExportQuizResult,
+        UploadQuizzes,
         GetMyOverallRating,
         GetAllQuizAverage,
         GetLastCompletionTimes,
@@ -331,6 +335,7 @@ def infrastructure_provider() -> Provider:
 
     provider.provide(PyJWTProcessor, scope=Scope.APP, provides=JWTProcessor)
     provider.provide(AccessTokenProcessor, scope=Scope.APP)
+    provider.provide(ExcelFileUpload, scope=Scope.APP, provides=UploadFile)
 
     return provider
 
