@@ -1,0 +1,99 @@
+[tool.poetry]
+name = "quizapp"
+version = "0.1.0"
+description = "Application for internship at meduzzen"
+authors = ["Andrii <andryxakulishow@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.115.2"
+uvicorn = "^0.32.0"
+environs = "^11.0.0"
+sqlalchemy = "^2.0.36"
+asyncpg = "^0.30.0"
+dishka = "^1.4.0"
+greenlet = "^3.1.1"
+redis = "^5.1.1"
+alembic = "^1.13.3"
+argon2-cffi = "^23.1.0"
+email-validator = "^2.2.0"
+orjson = "^3.10.10"
+pyjwt = "^2.9.0"
+cryptography = "^43.0.3"
+apscheduler = "^3.10.4"
+python-multipart = "^0.0.17"
+pandas = "^2.2.3"
+openpyxl = "^3.1.5"
+
+
+[tool.poetry.group.test.dependencies]
+pytest = "^8.3.3"
+httpx = "^0.27.2"
+pytest-asyncio = "^0.24.0"
+
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^4.0.1"
+ruff = "^0.7.0"
+
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+
+[tool.ruff]
+line-length = 79
+
+[tool.ruff.lint]
+select = ['ALL']
+
+ignore = [
+    # Rules emitting false alerts
+    'N804',
+    'B008',
+    'BLE001',
+    'RUF009',
+    'RUF001',
+    # Rules that are not applicable in the project for now
+    'D',
+    'TID252',
+    'D104',
+    'ANN',
+    'SLF001',
+    'ARG',
+    'D100',
+    'PLR0913',
+    'TCH002',
+    'EXE002',
+    'FA102',
+    # Strange and obscure rules that will never be turned on
+    'ANN101',
+    'FA100',
+    'TRY003',
+    'TRY201',
+    'EM',
+    'PERF203',
+    'TCH001',
+    'TD002',
+    'PTH201',
+    'RSE102',
+    'RET504',
+    'FBT001',
+    'TD003',
+    'B024',
+    'ISC001',
+    'B027',
+    'COM812',
+    'N999'
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ['F401']
+
+"test_*" = ['S101', 'PLR2004', 'PT023', 'PT001', 'PT006']
+"conftest.py" = ['PT023', 'PT001', 'PT006']
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -1,0 +1,71 @@
+services:
+  backend:
+    container_name: backend
+    build:
+      context: .
+      dockerfile: prod.Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "${SERVER_PORT}:${SERVER_PORT}"
+    volumes:
+      - ./app:/backend/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis_cache:
+        condition: service_healthy
+
+
+  postgres:
+    container_name: db
+    image: postgres:16-alpine
+    restart: unless-stopped
+    volumes:
+      - pg_data:/var/lib/postgresql/data/
+    env_file:
+      - .env
+    ports:
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -d $$POSTGRES_DB -U $$POSTGRES_USER" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  migration:
+    container_name: migration
+    build:
+      context: .
+      dockerfile: prod.Dockerfile
+    restart: on-failure
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: ["alembic", "upgrade", "head" ]
+
+
+  redis_cache:
+    container_name: redis_db
+    image: redis:7-alpine
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "${REDIS_PORT}:${REDIS_PORT}"
+    command: [ "redis-server", "--port", "${REDIS_PORT}", "--requirepass", "${REDIS_PASSWORD}" ]
+    volumes:
+      - cache:/data
+    healthcheck:
+      test: [ "CMD-SHELL", "redis-cli", "-a", "$${REDIS_PASSWORD}", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pg_data:
+  cache:

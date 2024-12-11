@@ -1,0 +1,62 @@
+name: Deploy to AWS
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Create .env file
+        run: |
+          echo "SERVER_HOST=${{ secrets.SERVER_HOST }}" >> .env
+          echo "SERVER_PORT=${{ secrets.SERVER_PORT }}" >> .env
+          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
+          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
+          echo "POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}" >> .env
+          echo "POSTGRES_PORT=${{ secrets.POSTGRES_PORT }}" >> .env
+          echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .env
+          echo "REDIS_HOST=${{ secrets.REDIS_HOST }}" >> .env
+          echo "REDIS_PORT=${{ secrets.REDIS_PORT }}" >> .env
+          echo "REDIS_DB=${{ secrets.REDIS_DB }}" >> .env
+          echo "REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}" >> .env
+          echo "JWT_KEY=${{ secrets.JWT_KEY }}" >> .env
+          echo "JWT_ALGORITHM=${{ secrets.JWT_ALGORITHM }}" >> .env
+          echo "DOMAIN=${{ secrets.DOMAIN }}" >> .env
+          echo "AUDIENCE=${{ secrets.AUDIENCE }}" >> .env
+
+      - name: Log in to Amazon ECR
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_URI }}
+
+      - name: Build Docker image
+        run: docker build --platform linux/amd64 -t quiz-app -f prod.Dockerfile .
+
+      - name: Tag Docker image
+        run: docker tag quiz-app:latest ${{ secrets.ECR_URI }}/quiz/quiz-app:latest
+
+      - name: Push Docker image to Amazon ECR
+        run: docker push ${{ secrets.ECR_URI }}/quiz/quiz-app:latest
+
+      - name: Update App Runner Service
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          ECR_URI: ${{ secrets.ECR_URI }}
+        run: |
+          SERVICE_ARN=$(aws apprunner list-services --query "ServiceSummaryList[?ServiceName=='Quiz_App'].ServiceArn" --output text)
+          if [ -z "$SERVICE_ARN" ]; then
+            echo "Service not found in App Runner."
+            exit 1
+          fi
+          aws apprunner start-deployment --service-arn "$SERVICE_ARN"
